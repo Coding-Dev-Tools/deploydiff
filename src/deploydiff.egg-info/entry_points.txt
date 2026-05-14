@@ -1,0 +1,2 @@
+[console_scripts]
+deploydiff = deploydiff.cli:main

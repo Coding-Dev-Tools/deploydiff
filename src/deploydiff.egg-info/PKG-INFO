@@ -1,0 +1,52 @@
+Metadata-Version: 2.4
+Name: deploydiff
+Version: 0.1.0
+Summary: Preview infrastructure changes (Terraform, CloudFormation, Pulumi) with cost impact and rollback commands
+License: MIT
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: click>=8.1
+Requires-Dist: rich>=13.0
+Requires-Dist: pyyaml>=6.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0; extra == "dev"
+
+# DeployDiff CLI
+
+Preview infrastructure changes with human-readable diffs, cost impact estimation, and rollback commands.
+
+Supports: Terraform plan JSON, CloudFormation change sets, Pulumi previews.
+
+## Install
+
+```bash
+pip install deploydiff
+```
+
+## Usage
+
+```bash
+# Preview infrastructure changes
+deploydiff preview --tf plan.json
+deploydiff preview --cfn changeset.json
+deploydiff preview --pulumi preview.json
+
+# Estimate cost impact
+deploydiff cost --tf plan.json
+deploydiff cost --cfn changeset.json
+
+# Generate rollback commands
+deploydiff rollback --tf plan.json
+deploydiff rollback --cfn changeset.json
+```
+
+## Pricing Tiers
+
+- **Free**: 1 stack
+- **Pro** ($25/mo): Unlimited stacks
+- **Team** ($79/mo): Multi-stack, team collaboration
+
+## License
+
+MIT
