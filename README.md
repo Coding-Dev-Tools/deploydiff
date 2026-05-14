@@ -1,12 +1,12 @@
 # DeployDiff CLI
 
-Preview infrastructure changes with cost impact estimates and rollback commands — **before** you apply anything.
+Ship infrastructure changes with confidence. See cost estimates, full change previews, and automatic rollback commands — all before you hit apply.
 
 [![PyPI](https://img.shields.io/pypi/v/deploydiff)](https://pypi.org/project/deploydiff/)
 [![Python](https://img.shields.io/pypi/pyversions/deploydiff)](https://pypi.org/project/deploydiff/)
 [![License](https://img.shields.io/pypi/l/deploydiff)](https://github.com/Coding-Dev-Tools/deploydiff/blob/main/LICENSE)
 
-**Why DeployDiff?** Infrastructure teams need clarity before applying changes. DeployDiff decodes Terraform, CloudFormation, and Pulumi plans into a clear, human-readable preview — showing exactly what changes, what they'll cost, and how to roll back. Teams that preview before applying ship faster with fewer incidents. Works with Terraform, CloudFormation, and Pulumi out of the box.
+**Why DeployDiff?** Infrastructure changes shouldn't be blind rolls of the dice. DeployDiff decodes Terraform, CloudFormation, and Pulumi plans into clear, human-readable previews — showing exactly what changes, what they'll cost, and how to roll back. Teams using DeployDiff ship faster, with fewer incidents, and zero guesswork. Works with Terraform, CloudFormation, and Pulumi out of the box.
 
 ## Install
 
