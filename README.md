@@ -62,32 +62,33 @@ deploydiff cost --tf plan.json --threshold 500 || echo "Cost increase exceeds $5
 
 ## Pricing
 
-One license covers all Revenue Holdings CLI tools. Pricing is per-seat.
+DeployDiff is one of eight tools in the Revenue Holdings suite. One license covers all CLI tools.
 
-| Tier | Price | Best For |
+| Plan | Price | Best For |
 |------|-------|----------|
-| **Open Source** | $0 | Individual devs, OSS projects — CLI only, 1 stack |
-| **Pro** | **$29/mo** ($23 billed annually) | Professional devs — unlimited stacks, cost estimation |
-| **Team** | **$79/mo** ($63 billed annually) | Teams up to 5 — multi-stack, team collaboration, alerting |
-| **Enterprise** | **$199/mo** (custom) | Organizations — compliance reports, RBAC, SSO, SLA |
+| **Free** | $0 | Individual devs, OSS — CLI only, 1 plan comparison |
+| **DeployDiff Individual** | **$15/mo** ($12 billed annually) | Professional devs — unlimited plans, cost estimation |
+| **Suite (all 8 tools)** | **$49/mo** ($39 billed annually) | Full Revenue Holdings toolkit — 40% savings |
+| **Team** | **$79/mo** ($63 billed annually) | Up to 5 devs — shared reports, Slack alerts |
+| **Enterprise** | Custom | SSO, RBAC, compliance reports, dedicated support |
 
-🔹 **No lock-in**: CLI works fully offline on the free tier — no telemetry, no phone-home.  
+🔹 **No lock-in**: CLI works fully offline on the free tier — no telemetry, no phone-home.
 🔹 **Annual billing**: Save 20%.
 
 ### Per-Tier Features
 
-| Feature | OSS | Pro | Team | Enterprise |
-|---------|:---:|:---:|:----:|:----------:|
-| CLI: preview, cost, rollback | ✓ | ✓ | ✓ | ✓ |
-| Unlimited stacks | — | ✓ | ✓ | ✓ |
-| Cost impact estimation | — | ✓ | ✓ | ✓ |
-| Multi-provider (TF, CFN, Pulumi) | — | ✓ | ✓ | ✓ |
-| Team collaboration / shared reports | — | — | ✓ | ✓ |
-| Slack / webhook alerts | — | — | ✓ | ✓ |
-| Compliance reports | — | — | — | ✓ |
-| RBAC | — | — | — | ✓ |
-| SSO / SAML / OIDC | — | — | — | ✓ |
-| Priority support | Community | 24h | 8h | Dedicated |
+| Feature | Free | DeployDiff | Suite | Team | Enterprise |
+|---------|:----:|:----------:|:-----:|:----:|:----------:|
+| CLI: preview, cost, rollback | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Unlimited stacks | — | ✓ | ✓ | ✓ | ✓ |
+| Cost impact estimation | — | ✓ | ✓ | ✓ | ✓ |
+| Multi-provider (TF, CFN, Pulumi) | — | ✓ | ✓ | ✓ | ✓ |
+| Team collaboration / shared reports | — | — | — | ✓ | ✓ |
+| Slack / webhook alerts | — | — | — | ✓ | ✓ |
+| Compliance reports | — | — | — | — | ✓ |
+| RBAC | — | — | — | — | ✓ |
+| SSO / SAML / OIDC | — | — | — | — | ✓ |
+| Priority support | Community | 24h | 24h | 8h | Dedicated |
 
 ---
 
