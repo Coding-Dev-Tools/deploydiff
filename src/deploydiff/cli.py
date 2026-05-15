@@ -70,6 +70,17 @@ def rollback(terraform_file, cloudformation_file, pulumi_file):
         console.print(cmd)
 
 
+@main.command()
+def mcp():
+    """Run as an MCP (Model Context Protocol) server over stdio.
+
+    AI coding agents (Claude Code, Cursor, etc.) use this to interact
+    with deploydiff tools directly.
+    """
+    from click_to_mcp import serve_stdio
+    serve_stdio(main, name="deploydiff")
+
+
 def _load_plan(
     terraform_file: str | None,
     cloudformation_file: str | None,
