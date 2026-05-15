@@ -1,14 +1,14 @@
 # DeployDiff CLI
 
-Ship infrastructure changes with confidence. See cost estimates, full change previews, and automatic rollback commands — all before you hit apply.
+Preview infrastructure changes with human-readable diffs, cost impact estimation, and rollback commands — before you hit deploy.
 
 [![PyPI](https://img.shields.io/pypi/v/deploydiff)](https://pypi.org/project/deploydiff/)
 [![Python](https://img.shields.io/pypi/pyversions/deploydiff)](https://pypi.org/project/deploydiff/)
 [![License](https://img.shields.io/pypi/l/deploydiff)](https://github.com/Coding-Dev-Tools/deploydiff/blob/main/LICENSE)
 
-**Why DeployDiff?** Infrastructure changes shouldn't be blind rolls of the dice. DeployDiff decodes Terraform, CloudFormation, and Pulumi plans into clear, human-readable previews — showing exactly what changes, what they'll cost, and how to roll back. Teams using DeployDiff ship faster, with fewer incidents, and zero guesswork. Works with Terraform, CloudFormation, and Pulumi out of the box.
+**Why DeployDiff?** Every infrastructure change carries risk — wrong config, unexpected cost, unreachable state. DeployDiff gives you a clear, human-readable preview of what's about to change before Terraform, CloudFormation, or Pulumi applies it. See which resources are being created, modified, or destroyed. Estimate cost impact so surprise bills don't show up. Get rollback commands pre-generated so recovery isn't panic-mode. Supports Terraform plan JSON, CloudFormation change sets, and Pulumi previews.
 
-## Install
+## Installation
 
 ```bash
 pip install deploydiff
@@ -31,6 +31,35 @@ deploydiff rollback --tf plan.json
 deploydiff rollback --cfn changeset.json
 ```
 
+### What You Get With `preview`
+
+- **Resource summary**: count of creates, updates, deletes, and replaces
+- **Property-level diffs**: what changed, from what to what
+- **Destructive action highlighting**: replaces and deletions called out
+- **Multi-provider**: Terraform, CloudFormation, Pulumi from a single CLI
+
+### What You Get With `cost`
+
+- **Cost impact estimate**: before vs. after per resource
+- **Provider-native pricing**: reads Terraform/CFN cost metadata
+- **Summary row**: total monthly change
+
+### What You Get With `rollback`
+
+- **Generated rollback commands**: reverse the last plan
+- **Provider-specific**: correct syntax for Terraform, CloudFormation
+- **No manual command construction**: eliminates panic-mode mistakes
+
+## CI/CD Integration
+
+```bash
+# Preview changes in CI, gate on destructive actions
+deploydiff preview --tf plan.json --exit-on-destroy || echo "Contains destructive changes!"
+
+# Add cost check to your deployment pipeline
+deploydiff cost --tf plan.json --threshold 500 || echo "Cost increase exceeds $500!"
+```
+
 ## Pricing
 
 One license covers all Revenue Holdings CLI tools. Pricing is per-seat.
@@ -39,23 +68,26 @@ One license covers all Revenue Holdings CLI tools. Pricing is per-seat.
 |------|-------|----------|
 | **Open Source** | $0 | Individual devs, OSS projects — CLI only, 1 stack |
 | **Pro** | **$29/mo** ($23 billed annually) | Professional devs — unlimited stacks, cost estimation |
-| **Team** | **$79/mo** ($63 billed annually) | Teams up to 5 — multi-stack orchestration, priority support |
-| **Enterprise** | **$199/mo** (custom) | Organizations — SSO/SAML, RBAC, dedicated support, SLA |
+| **Team** | **$79/mo** ($63 billed annually) | Teams up to 5 — multi-stack, team collaboration, alerting |
+| **Enterprise** | **$199/mo** (custom) | Organizations — compliance reports, RBAC, SSO, SLA |
 
 🔹 **No lock-in**: CLI works fully offline on the free tier — no telemetry, no phone-home.  
-🔹 **Annual billing**: Save 20%.  
+🔹 **Annual billing**: Save 20%.
 
 ### Per-Tier Features
 
 | Feature | OSS | Pro | Team | Enterprise |
 |---------|:---:|:---:|:----:|:----------:|
-| Preview (Terraform, CloudFormation, Pulumi) | ✓ | ✓ | ✓ | ✓ |
+| CLI: preview, cost, rollback | ✓ | ✓ | ✓ | ✓ |
 | Unlimited stacks | — | ✓ | ✓ | ✓ |
 | Cost impact estimation | — | ✓ | ✓ | ✓ |
-| Rollback command generation | — | ✓ | ✓ | ✓ |
-| Multi-stack orchestration | — | — | ✓ | ✓ |
-| Priority support | Community | 24h | 8h | Dedicated |
+| Multi-provider (TF, CFN, Pulumi) | — | ✓ | ✓ | ✓ |
+| Team collaboration / shared reports | — | — | ✓ | ✓ |
+| Slack / webhook alerts | — | — | ✓ | ✓ |
+| Compliance reports | — | — | — | ✓ |
+| RBAC | — | — | — | ✓ |
 | SSO / SAML / OIDC | — | — | — | ✓ |
+| Priority support | Community | 24h | 8h | Dedicated |
 
 ---
 
