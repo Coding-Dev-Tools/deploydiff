@@ -11,12 +11,6 @@ requires-python = ">=3.9"
 license = "MIT"
 authors = [{name = "Revenue Holdings"}]
 
-[project.urls]
-Homepage = "https://github.com/Coding-Dev-Tools/deploydiff"
-Repository = "https://github.com/Coding-Dev-Tools/deploydiff"
-Documentation = "https://github.com/Coding-Dev-Tools/deploydiff#readme"
-"Issue Tracker" = "https://github.com/Coding-Dev-Tools/deploydiff/issues"
-
 dependencies = [
     "click>=8.1",
     "rich>=13.0",
@@ -31,6 +25,12 @@ dev = [
 
 [project.scripts]
 deploydiff = "deploydiff.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Coding-Dev-Tools/deploydiff"
+Repository = "https://github.com/Coding-Dev-Tools/deploydiff"
+Documentation = "https://github.com/Coding-Dev-Tools/deploydiff#readme"
+"Issue Tracker" = "https://github.com/Coding-Dev-Tools/deploydiff/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
