@@ -1,5 +1,7 @@
 # DeployDiff CLI
 
+[![GitHub stars](https://img.shields.io/github/stars/Coding-Dev-Tools/deploydiff?style=social)](https://github.com/Coding-Dev-Tools/deploydiff/stargazers)
+
 Preview infrastructure changes with human-readable diffs, cost impact estimation, and rollback commands — before you hit deploy.
 
 [![PyPI](https://img.shields.io/pypi/v/deploydiff)](https://pypi.org/project/deploydiff/)
