@@ -1,6 +1,7 @@
 click>=8.1
 rich>=13.0
 pyyaml>=6.0
+revenueholdings-license>=0.1.0
 
 [dev]
 pytest>=7.0
