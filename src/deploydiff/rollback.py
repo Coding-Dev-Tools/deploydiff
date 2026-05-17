@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from .models import ChangeAction, ChangeSource, DeployPlan, ResourceChange
+from .models import ChangeSource, DeployPlan
 
 
 def generate_rollback_commands(plan: DeployPlan) -> list[str]:
@@ -92,10 +92,10 @@ def _cloudformation_rollback(plan: DeployPlan) -> list[str]:
 
     commands.append("")
     commands.append("# Full stack rollback options:")
-    commands.append(f"# Option 1: Roll back the stack update (if update-rollback triggered)")
+    commands.append("# Option 1: Roll back the stack update (if update-rollback triggered)")
     commands.append(f"aws cloudformation rollback-stack --stack-name {stack_name}")
     commands.append("")
-    commands.append(f"# Option 2: Delete the stack and recreate from previous template")
+    commands.append("# Option 2: Delete the stack and recreate from previous template")
     commands.append(f"aws cloudformation delete-stack --stack-name {stack_name}")
     commands.append(f"aws cloudformation wait stack-delete-complete --stack-name {stack_name}")
     commands.append(f"# Then redeploy with: aws cloudformation create-stack --stack-name {stack_name} ...")

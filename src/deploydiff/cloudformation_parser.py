@@ -41,7 +41,7 @@ def parse_cloudformation_changeset(changeset_json: str | dict[str, Any]) -> Depl
         try:
             data = json.loads(changeset_json)
         except json.JSONDecodeError:
-            with open(changeset_json, "r") as f:
+            with open(changeset_json) as f:
                 data = json.load(f)
     else:
         data = changeset_json
@@ -65,7 +65,7 @@ def parse_cloudformation_changeset(changeset_json: str | dict[str, Any]) -> Depl
         address = resource_change_data.get("LogicalResourceId", f"{resource_type}.{resource_name}")
 
         # Scope details for update changes
-        scope = resource_change_data.get("Scope", [])
+        resource_change_data.get("Scope", [])
         details = resource_change_data.get("Details", [])
 
         before = {}
@@ -89,7 +89,7 @@ def parse_cloudformation_changeset(changeset_json: str | dict[str, Any]) -> Depl
         )
         changes.append(resource_change)
 
-    stack_name = data.get("StackName", data.get("ChangeSetName", "unknown"))
+    data.get("StackName", data.get("ChangeSetName", "unknown"))
 
     return DeployPlan(
         source=ChangeSource.CLOUDFORMATION,

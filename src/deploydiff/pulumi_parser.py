@@ -39,7 +39,7 @@ def parse_pulumi_preview(preview_json: str | dict[str, Any]) -> DeployPlan:
         try:
             data = json.loads(preview_json)
         except json.JSONDecodeError:
-            with open(preview_json, "r") as f:
+            with open(preview_json) as f:
                 data = json.load(f)
     else:
         data = preview_json

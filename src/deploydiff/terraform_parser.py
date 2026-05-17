@@ -16,7 +16,6 @@ TF_ACTION_MAP: dict[str, ChangeAction] = {
     "create_before_delete": ChangeAction.CREATE_BEFORE_DELETE,
     "delete_before_create": ChangeAction.DELETE_BEFORE_CREATE,
     "no-op": ChangeAction.NO_OP,
-    "read": ChangeAction.READ,
 }
 
 
@@ -34,7 +33,7 @@ def parse_terraform_plan(plan_json: str | dict[str, Any]) -> DeployPlan:
             data = json.loads(plan_json)
         except json.JSONDecodeError:
             # Try as file path
-            with open(plan_json, "r") as f:
+            with open(plan_json) as f:
                 data = json.load(f)
     else:
         data = plan_json
@@ -43,7 +42,7 @@ def parse_terraform_plan(plan_json: str | dict[str, Any]) -> DeployPlan:
     changes: list[ResourceChange] = []
 
     # Parse planned changes
-    planned_values = data.get("planned_values", {})
+    data.get("planned_values", {})
     resource_changes = data.get("resource_changes", [])
 
     for rc in resource_changes:
@@ -86,7 +85,7 @@ def parse_terraform_plan(plan_json: str | dict[str, Any]) -> DeployPlan:
         changes.append(resource_change)
 
     # Parse output changes
-    output_changes = data.get("output_changes", {})
+    data.get("output_changes", {})
     # We track these as metadata but don't create ResourceChange entries
 
     return DeployPlan(

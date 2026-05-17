@@ -116,8 +116,8 @@ def _load_plan(
 
 def _render_costs(estimates: list[CostEstimate], plan: DeployPlan, console: Console) -> None:
     """Render cost estimates to the console."""
-    from rich.table import Table
     from rich import box
+    from rich.table import Table
 
     table = Table(title="Cost Impact Estimate", box=box.ROUNDED, show_header=True)
     table.add_column("Resource", style="bold")
@@ -149,4 +149,4 @@ def _render_costs(estimates: list[CostEstimate], plan: DeployPlan, console: Cons
     elif total < 0:
         console.print(f"\n[bold green]Total monthly decrease: -${abs(total):.2f}[/bold green]")
     else:
-        console.print(f"\n[bold]Total monthly change: $0.00[/bold]")
+        console.print("\n[bold]Total monthly change: $0.00[/bold]")

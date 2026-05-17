@@ -4,9 +4,8 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
 
-from .models import ChangeAction, ChangeSource, CostEstimate, DeployPlan, ResourceChange
+from .models import ChangeAction, CostEstimate, DeployPlan, ResourceChange
 
 # Local pricing data for common AWS resources (monthly estimates in USD)
 # These are baseline estimates; real pricing varies by region, usage, etc.
@@ -234,7 +233,7 @@ def _load_pricing(pricing_file: str | Path | None = None) -> dict[str, dict[str,
     if not path.exists():
         return DEFAULT_PRICING.copy()
 
-    with open(path, "r") as f:
+    with open(path) as f:
         custom = json.load(f)
 
     # Merge with defaults (custom overrides)
