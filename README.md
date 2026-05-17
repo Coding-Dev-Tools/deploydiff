@@ -4,9 +4,9 @@
 
 Preview infrastructure changes with human-readable diffs, cost impact estimation, and rollback commands â€” before you hit deploy.
 
-[![PyPI](https://img.shields.io/pypi/v/deploydiff)](https://pypi.org/project/deploydiff/)
-[![Python](https://img.shields.io/pypi/pyversions/deploydiff)](https://pypi.org/project/deploydiff/)
-[![License](https://img.shields.io/pypi/l/deploydiff)](https://github.com/Coding-Dev-Tools/deploydiff/blob/main/LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/Coding-Dev-Tools/deploydiff?label=latest)](https://github.com/Coding-Dev-Tools/deploydiff/releases)
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Coding-Dev-Tools/deploydiff/blob/main/LICENSE)
 
 **Why DeployDiff?** Every infrastructure change carries risk â€” wrong config, unexpected cost, unreachable state. DeployDiff gives you a clear, human-readable preview of what's about to change before Terraform, CloudFormation, or Pulumi applies it. See which resources are being created, modified, or destroyed. Estimate cost impact so surprise bills don't show up. Get rollback commands pre-generated so recovery isn't panic-mode. Supports Terraform plan JSON, CloudFormation change sets, and Pulumi previews.
 
