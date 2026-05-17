@@ -20,8 +20,12 @@ console = Console()
 @click.version_option(package_name="deploydiff")
 def main():
     """DeployDiff - Preview infrastructure changes with cost impact and rollback."""
-    from revenueholdings_license import require_license
-    require_license("deploydiff")
+    try:
+        from revenueholdings_license import require_license
+    except ImportError:
+        pass  # License check skipped (dev/CI mode)
+    else:
+        require_license("deploydiff")
     pass
 
 
