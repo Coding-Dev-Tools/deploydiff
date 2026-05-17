@@ -37,6 +37,12 @@ scoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-buck
 scoop install deploydiff
 ```
 
+**npm (Node.js wrapper):**
+```bash
+npm install -g deploydiff
+```
+Then run: `deploydiff --help`
+
 ## Usage
 
 ```bash
@@ -122,13 +128,3 @@ DeployDiff is one of eight tools in the Revenue Holdings suite. One license cove
 ## License
 
 MIT
-
-
-
-## Install via npm
-
-```bash
-npm install -g deploydiff
-```
-
-Then run: `deploydiff --help`
