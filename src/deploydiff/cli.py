@@ -13,6 +13,14 @@ from .pulumi_parser import parse_pulumi_preview
 from .rollback import generate_rollback_commands
 from .terraform_parser import parse_terraform_plan
 
+try:
+    from revenueholdings_license import require_license
+except ImportError:
+    def require_license(tool):
+        def decorator(func):
+            return func
+        return decorator
+
 console = Console()
 
 
@@ -20,13 +28,7 @@ console = Console()
 @click.version_option(package_name="deploydiff")
 def main():
     """DeployDiff - Preview infrastructure changes with cost impact and rollback."""
-    try:
-        from revenueholdings_license import require_license
-    except ImportError:
-        pass  # License check skipped (dev/CI mode)
-    else:
-        require_license("deploydiff")
-    pass
+    require_license("deploydiff")
 
 
 @main.command()
