@@ -1,0 +1,33 @@
+{
+  "name": "deploydiff",
+  "version": "0.1.0",
+  "description": "Compare deployment configurations across environments. Detect drift between staging and production configs.",
+  "author": "Revenue Holdings <engineering@revenueholdings.dev>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Coding-Dev-Tools/deploydiff.git"
+  },
+  "homepage": "https://github.com/Coding-Dev-Tools/deploydiff#readme",
+  "bugs": {
+    "url": "https://github.com/Coding-Dev-Tools/deploydiff/issues"
+  },
+  "bin": {
+    "deploydiff": "cli.js"
+  },
+  "keywords": [
+    "deployment",
+    "diff",
+    "devops",
+    "configuration",
+    "cli",
+    "infrastructure"
+  ],
+  "files": [
+    "cli.js"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "preferGlobal": true
+}
