@@ -83,7 +83,11 @@ def mcp():
     AI coding agents (Claude Code, Cursor, etc.) use this to interact
     with deploydiff tools directly.
     """
-    from click_to_mcp import serve_stdio
+    try:
+        from click_to_mcp import serve_stdio
+    except ImportError:
+        typer.echo("Error: click-to-mcp is required for MCP support. Install with: pip install click-to-mcp", err=True)
+        raise typer.Exit(code=1)
     serve_stdio(main, name="deploydiff")
 
 
