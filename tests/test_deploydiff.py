@@ -3,16 +3,14 @@
 import json
 import pytest
 from click.testing import CliRunner
-
-from deploydiff.models import ChangeAction, ChangeSource, CostEstimate, DeployPlan, ResourceChange
-from deploydiff.terraform_parser import parse_terraform_plan
-from deploydiff.cloudformation_parser import parse_cloudformation_changeset
-from deploydiff.pulumi_parser import parse_pulumi_preview
-from deploydiff.cost_estimator import estimate_costs, DEFAULT_PRICING
-from deploydiff.rollback import generate_rollback_commands
-from deploydiff.diff_renderer import render_plan
 from deploydiff.cli import main
-
+from deploydiff.cloudformation_parser import parse_cloudformation_changeset
+from deploydiff.cost_estimator import estimate_costs
+from deploydiff.diff_renderer import render_plan
+from deploydiff.models import ChangeAction, ChangeSource, CostEstimate, DeployPlan, ResourceChange
+from deploydiff.pulumi_parser import parse_pulumi_preview
+from deploydiff.rollback import generate_rollback_commands
+from deploydiff.terraform_parser import parse_terraform_plan
 
 # ── Fixtures ──────────────────────────────────────────────────────────────
 
@@ -233,7 +231,10 @@ class TestTerraformParser:
 
     def test_parse_multi_action(self, sample_terraform_plan):
         plan = parse_terraform_plan(sample_terraform_plan)
-        multi_changes = [c for c in plan.changes if c.action in (ChangeAction.CREATE_BEFORE_DELETE, ChangeAction.DELETE_BEFORE_CREATE)]
+        multi_changes = [
+        c for c in plan.changes
+        if c.action in (ChangeAction.CREATE_BEFORE_DELETE, ChangeAction.DELETE_BEFORE_CREATE)
+    ]
         assert len(multi_changes) == 1
 
     def test_module_path(self, sample_terraform_plan):
@@ -410,8 +411,8 @@ class TestRollback:
 class TestRenderer:
     def test_render_basic_plan(self, sample_terraform_plan):
         """Render should not raise errors."""
-        from rich.console import Console
         from io import StringIO
+        from rich.console import Console
         plan = parse_terraform_plan(sample_terraform_plan)
         buf = StringIO()
         console = Console(file=buf, force_terminal=True)
