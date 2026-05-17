@@ -13,14 +13,6 @@ from .pulumi_parser import parse_pulumi_preview
 from .rollback import generate_rollback_commands
 from .terraform_parser import parse_terraform_plan
 
-try:
-    from revenueholdings_license import require_license
-except ImportError:
-    def require_license(tool):
-        def decorator(func):
-            return func
-        return decorator
-
 console = Console()
 
 
@@ -28,7 +20,13 @@ console = Console()
 @click.version_option(package_name="deploydiff")
 def main():
     """DeployDiff - Preview infrastructure changes with cost impact and rollback."""
-    require_license("deploydiff")
+    try:
+        from revenueholdings_license import require_license
+        require_license("deploydiff")
+    except ImportError:
+        import warnings
+        warnings.warn("revenueholdings-license not installed; license checks skipped", stacklevel=2)
+    pass
 
 
 @main.command()
@@ -116,8 +114,8 @@ def _load_plan(
 
 def _render_costs(estimates: list[CostEstimate], plan: DeployPlan, console: Console) -> None:
     """Render cost estimates to the console."""
-    from rich import box
     from rich.table import Table
+    from rich import box
 
     table = Table(title="Cost Impact Estimate", box=box.ROUNDED, show_header=True)
     table.add_column("Resource", style="bold")
@@ -149,4 +147,4 @@ def _render_costs(estimates: list[CostEstimate], plan: DeployPlan, console: Cons
     elif total < 0:
         console.print(f"\n[bold green]Total monthly decrease: -${abs(total):.2f}[/bold green]")
     else:
-        console.print("\n[bold]Total monthly change: $0.00[/bold]")
+        console.print(f"\n[bold]Total monthly change: $0.00[/bold]")

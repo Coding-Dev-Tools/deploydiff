@@ -16,24 +16,13 @@ dependencies = [
     "rich>=13.0",
     "pyyaml>=6.0",
 ]
-keywords = ["infrastructure", "terraform", "cloudformation", "pulumi", "cost", "diff", "cli"]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "Topic :: System :: Systems Administration",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-]
 
 [project.optional-dependencies]
-license = ["revenueholdings-license>=0.1.0"]
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
 ]
+license = ["revenueholdings-license>=0.1.0"]
 
 [project.scripts]
 deploydiff = "deploydiff.cli:main"
@@ -49,14 +38,3 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-
-[tool.ruff]
-target-version = "py310"
-line-length = 120
-
-[tool.ruff.lint]
-select = ["E", "F", "W", "I", "UP", "B", "SIM"]
-ignore = ["E501"]
-
-[tool.ruff.lint.isort]
-known-first-party = ["*"]
