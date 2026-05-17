@@ -8,19 +8,31 @@ Project-URL: Homepage, https://github.com/Coding-Dev-Tools/deploydiff
 Project-URL: Repository, https://github.com/Coding-Dev-Tools/deploydiff
 Project-URL: Documentation, https://github.com/Coding-Dev-Tools/deploydiff#readme
 Project-URL: Issue Tracker, https://github.com/Coding-Dev-Tools/deploydiff/issues
+Keywords: infrastructure,terraform,cloudformation,pulumi,cost,diff,cli
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: System :: Systems Administration
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
 Requires-Python: >=3.9
 Description-Content-Type: text/markdown
 License-File: LICENSE
 Requires-Dist: click>=8.1
 Requires-Dist: rich>=13.0
 Requires-Dist: pyyaml>=6.0
-Requires-Dist: revenueholdings-license>=0.1.0
+Provides-Extra: license
+Requires-Dist: revenueholdings-license>=0.1.0; extra == "license"
 Provides-Extra: dev
 Requires-Dist: pytest>=7.0; extra == "dev"
 Requires-Dist: pytest-cov>=4.0; extra == "dev"
 Dynamic: license-file
 
 # DeployDiff CLI
+
+[![GitHub stars](https://img.shields.io/github/stars/Coding-Dev-Tools/deploydiff?style=social)](https://github.com/Coding-Dev-Tools/deploydiff/stargazers)
 
 Preview infrastructure changes with human-readable diffs, cost impact estimation, and rollback commands — before you hit deploy.
 
