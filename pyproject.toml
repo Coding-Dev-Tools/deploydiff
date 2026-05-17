@@ -15,10 +15,21 @@ dependencies = [
     "click>=8.1",
     "rich>=13.0",
     "pyyaml>=6.0",
-    "revenueholdings-license>=0.1.0",
+]
+keywords = ["infrastructure", "terraform", "cloudformation", "pulumi", "cost", "diff", "cli"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: System :: Systems Administration",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
 
 [project.optional-dependencies]
+license = ["revenueholdings-license>=0.1.0"]
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
