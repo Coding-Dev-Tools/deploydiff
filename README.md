@@ -112,3 +112,12 @@ DeployDiff is one of eight tools in the Revenue Holdings suite. One license cove
 
 MIT
 
+
+
+## Install via npm
+
+```bash
+npm install -g deploydiff
+```
+
+Then run: `deploydiff --help`
