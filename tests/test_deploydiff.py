@@ -421,6 +421,199 @@ class TestRenderer:
         assert "DeployDiff" in output
         assert "Change Summary" in output
 
+    def test_render_empty_plan(self):
+        """Render an empty plan shows no changes."""
+        from io import StringIO
+        from rich.console import Console
+        plan = DeployPlan(source=ChangeSource.TERRAFORM, changes=[])
+        buf = StringIO()
+        console = Console(file=buf, force_terminal=True)
+        render_plan(plan, console)
+        output = buf.getvalue()
+        assert "DeployDiff" in output
+        assert "0 resource(s)" not in output
+
+    def test_render_verbose_terraform(self, sample_terraform_plan):
+        """Verbose mode shows before/after details for each change."""
+        from io import StringIO
+        from rich.console import Console
+        plan = parse_terraform_plan(sample_terraform_plan)
+        buf = StringIO()
+        console = Console(file=buf, force_terminal=True)
+        render_plan(plan, console, verbose=True)
+        output = buf.getvalue()
+        assert "instance_type" in output
+        assert "t3.micro" in output
+
+    def test_render_verbose_with_sensitive(self):
+        """Verbose mode masks sensitive values."""
+        from io import StringIO
+        from rich.console import Console
+        change = ResourceChange(
+            address="aws_db_instance.db",
+            action=ChangeAction.UPDATE,
+            resource_type="aws_db_instance",
+            resource_name="db",
+            source=ChangeSource.TERRAFORM,
+            before={"password": "secret123", "port": 5432},
+            after={"password": "newsecret", "port": 5432},
+            before_sensitive={"password"},
+            after_sensitive={"password"},
+        )
+        plan = DeployPlan(source=ChangeSource.TERRAFORM, changes=[change])
+        buf = StringIO()
+        console = Console(file=buf, force_terminal=True)
+        render_plan(plan, console, verbose=True)
+        output = buf.getvalue()
+        # Check for "sensitive value" text (may be split by ANSI codes around parentheses)
+        assert "sensitive value" in output
+        assert "secret123" not in output
+        assert "5432" in output
+
+    def test_render_destructive_change_warning(self, sample_terraform_plan):
+        """Destructive changes trigger a warning message."""
+        from io import StringIO
+        from rich.console import Console
+        plan = parse_terraform_plan(sample_terraform_plan)
+        buf = StringIO()
+        console = Console(file=buf, force_terminal=True)
+        render_plan(plan, console)
+        output = buf.getvalue()
+        # "destructive" appears contiguously even with ANSI codes
+        assert "destructive" in output.lower()
+
+    def test_render_plan_without_destructive_changes(self):
+        """Plan with only creates/updates should not show destructive warning."""
+        from io import StringIO
+        from rich.console import Console
+        changes = [
+            ResourceChange(
+                address="aws_instance.web",
+                action=ChangeAction.CREATE,
+                resource_type="aws_instance",
+                resource_name="web",
+                source=ChangeSource.TERRAFORM,
+            ),
+            ResourceChange(
+                address="aws_db_instance.db",
+                action=ChangeAction.UPDATE,
+                resource_type="aws_db_instance",
+                resource_name="db",
+                source=ChangeSource.TERRAFORM,
+            ),
+        ]
+        plan = DeployPlan(source=ChangeSource.TERRAFORM, changes=changes)
+        buf = StringIO()
+        console = Console(file=buf, force_terminal=True)
+        render_plan(plan, console)
+        output = buf.getvalue()
+        assert "destructive" not in output.lower()
+
+    def test_render_cfn_plan(self, sample_cfn_changeset):
+        """Render a CloudFormation plan."""
+        from io import StringIO
+        from rich.console import Console
+        plan = parse_cloudformation_changeset(sample_cfn_changeset)
+        buf = StringIO()
+        console = Console(file=buf, force_terminal=True)
+        render_plan(plan, console)
+        output = buf.getvalue()
+        assert "Cloudformation" in output or "CloudFormation" in output
+        assert "Change Summary" in output
+
+    def test_render_pulumi_plan(self, sample_pulumi_preview):
+        """Render a Pulumi plan."""
+        from io import StringIO
+        from rich.console import Console
+        plan = parse_pulumi_preview(sample_pulumi_preview)
+        buf = StringIO()
+        console = Console(file=buf, force_terminal=True)
+        render_plan(plan, console)
+        output = buf.getvalue()
+        assert "Pulumi" in output
+
+    def test_render_replacement(self):
+        """Render a plan with a replacement change."""
+        from io import StringIO
+        from rich.console import Console
+        change = ResourceChange(
+            address="module.vpc.aws_nat_gateway.main",
+            action=ChangeAction.REPLACE,
+            resource_type="aws_nat_gateway",
+            resource_name="main",
+            source=ChangeSource.TERRAFORM,
+            before={"connectivity_type": "public"},
+            after={"connectivity_type": "private"},
+            module_path="module.vpc",
+        )
+        plan = DeployPlan(source=ChangeSource.TERRAFORM, changes=[change])
+        buf = StringIO()
+        console = Console(file=buf, force_terminal=True)
+        render_plan(plan, console)
+        output = buf.getvalue()
+        assert "⇄" in output or "will be replaced" in output.lower()
+
+    def test_render_change_details_missing_data(self):
+        """Render change details with no before/after should not error."""
+        from io import StringIO
+        from rich.console import Console
+        from deploydiff.diff_renderer import _render_change_details
+        change = ResourceChange(
+            address="aws_instance.web",
+            action=ChangeAction.CREATE,
+            resource_type="aws_instance",
+            resource_name="web",
+            source=ChangeSource.TERRAFORM,
+            before=None,
+            after=None,
+        )
+        buf = StringIO()
+        console = Console(file=buf, force_terminal=True)
+        # Should not raise
+        _render_change_details(change, console)
+        output = buf.getvalue()
+        assert output == ""
+
+    def test_group_by_action(self):
+        """Grouping changes by action produces correct buckets."""
+        from deploydiff.diff_renderer import _group_by_action
+        changes = [
+            ResourceChange("a", ChangeAction.CREATE, "t", "n", ChangeSource.TERRAFORM),
+            ResourceChange("b", ChangeAction.CREATE, "t", "n", ChangeSource.TERRAFORM),
+            ResourceChange("c", ChangeAction.UPDATE, "t", "n", ChangeSource.TERRAFORM),
+            ResourceChange("d", ChangeAction.DELETE, "t", "n", ChangeSource.TERRAFORM),
+        ]
+        plan = DeployPlan(source=ChangeSource.TERRAFORM, changes=changes)
+        groups = _group_by_action(plan)
+        assert len(groups[ChangeAction.CREATE]) == 2
+        assert len(groups[ChangeAction.UPDATE]) == 1
+        assert len(groups[ChangeAction.DELETE]) == 1
+        assert ChangeAction.CREATE_BEFORE_DELETE not in groups
+
+    def test_render_console_none(self):
+        """Renderer creates its own Console if none is provided."""
+        plan = DeployPlan(source=ChangeSource.TERRAFORM, changes=[])
+        # Should not raise when console is None
+        render_plan(plan)
+
+    def test_render_create_before_delete_action_label(self):
+        """Create-before-delete action has the right label."""
+        from deploydiff.diff_renderer import ACTION_LABELS
+        label = ACTION_LABELS[ChangeAction.CREATE_BEFORE_DELETE]
+        assert "create-first" in label
+
+    def test_render_no_op_label(self):
+        """No-op action has the right label."""
+        from deploydiff.diff_renderer import ACTION_LABELS
+        label = ACTION_LABELS[ChangeAction.NO_OP]
+        assert label == "no changes"
+
+    def test_render_import_action_label(self):
+        """Import action has the right label."""
+        from deploydiff.diff_renderer import ACTION_LABELS
+        label = ACTION_LABELS[ChangeAction.IMPORT]
+        assert "imported" in label
+
 
 # ── CLI Integration Tests ─────────────────────────────────────────────────
 
