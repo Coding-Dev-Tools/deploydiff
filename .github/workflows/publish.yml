@@ -21,12 +21,12 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
 
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v6
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
@@ -46,7 +46,6 @@ jobs:
 
       - name: Publish to TestPyPI
         if: ${{ inputs.pypi_target == 'testpypi' }}
-<<<<<<< HEAD
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
@@ -54,10 +53,3 @@ jobs:
       - name: Publish to PyPI
         if: ${{ inputs.pypi_target == 'pypi' || github.event_name == 'release' }}
         uses: pypa/gh-action-pypi-publish@release/v1
-=======
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        run: |
-          twine upload --repository testpypi dist/* --verbose
->>>>>>> 6a1c694d4432dfdcf5c2689e7113670a0a2c2e6b

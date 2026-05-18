@@ -1,6 +1,5 @@
 version: 2
 updates:
-<<<<<<< HEAD
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
@@ -20,15 +19,3 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - "ci"
-=======
-  - package-ecosystem: pip
-    directory: "/"
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
-  - package-ecosystem: github-actions
-    directory: "/"
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 3
->>>>>>> 6a1c694d4432dfdcf5c2689e7113670a0a2c2e6b
