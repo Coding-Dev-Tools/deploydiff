@@ -38,12 +38,6 @@ scoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-buck
 scoop install deploydiff
 ```
 
-**npm (Node.js wrapper):**
-```bash
-npm install -g deploydiff
-```
-Then run: `deploydiff --help`
-
 ## Usage
 
 ```bash
@@ -119,21 +113,14 @@ deploydiff cost --tf plan.json --pricing custom-pricing.json
 
 ## Pricing
 
-DeployDiff is one of eleven tools in the DevForge suite. One license covers all CLI tools.
+DeployDiff is one of eleven tools in the Revenue Holdings suite. One license covers all CLI tools.
 
 | Plan | Price | Best For |
 |------|-------|----------|
-<<<<<<< HEAD
-| **Free** | $0 | Individual devs, OSS â€” CLI only, 1 plan comparison |
-| **DeployDiff Individual** | **$15/mo** ($12 billed annually) | Professional devs â€” unlimited plans, cost estimation |
-| **Suite (all 11 tools)** | **$49/mo** ($39 billed annually) | Full Revenue Holdings toolkit â€” 40% savings |
-| **Team** | **$79/mo** ($63 billed annually) | Up to 5 devs â€” shared reports, Slack alerts |
-=======
 | **Free** | $0 | Individual devs, OSS — CLI only, 1 plan comparison |
 | **DeployDiff Individual** | **$15/mo** ($12 billed annually) | Professional devs — unlimited plans, cost estimation |
-| **Suite (all 11 tools)** | **$49/mo** ($39 billed annually) | Full DevForge toolkit — 40% savings |
+| **Suite (all 11 tools)** | **$49/mo** ($39 billed annually) | Full Revenue Holdings toolkit — 40% savings |
 | **Team** | **$79/mo** ($63 billed annually) | Up to 5 devs — shared reports, Slack alerts |
->>>>>>> 6a1c694d4432dfdcf5c2689e7113670a0a2c2e6b
 | **Enterprise** | Custom | SSO, RBAC, compliance reports, dedicated support |
 
 🔹 **No lock-in**: CLI works fully offline on the free tier — no telemetry, no phone-home.
@@ -157,7 +144,7 @@ DeployDiff is one of eleven tools in the DevForge suite. One license covers all 
 ---
 
 <p align="center">
-  <sub>Part of <a href="https://coding-dev-tools.github.io/revenueholdings.dev/">DevForge</a> — CLI tools built by autonomous AI.</sub>
+  <sub>Part of <a href="https://coding-dev-tools.github.io/revenueholdings.dev/">Revenue Holdings</a> — CLI tools built by autonomous AI.</sub>
 </p>
 
 ## License
