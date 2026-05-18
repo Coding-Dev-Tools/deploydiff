@@ -481,3 +481,68 @@ class TestCLI:
         runner = CliRunner()
         result = runner.invoke(main, ["rollback", "--pulumi", str(pulumi_file)])
         assert result.exit_code == 0
+
+    def test_preview_exit_on_destroy_no_destroy(self, tmp_path):
+        """--exit-on-destroy exits 0 when plan has no destructive changes."""
+        # Plan with only creates and updates — no deletes/replaces
+        safe_plan = {
+            "format_version": "1.2",
+            "resource_changes": [
+                {
+                    "address": "aws_instance.web",
+                    "type": "aws_instance",
+                    "name": "web",
+                    "provider_name": "registry.terraform.io/hashicorp/aws",
+                    "change": {
+                        "actions": ["create"],
+                        "before": None,
+                        "after": {"instance_type": "t3.micro"},
+                    },
+                },
+                {
+                    "address": "aws_db_instance.primary",
+                    "type": "aws_db_instance",
+                    "name": "primary",
+                    "provider_name": "registry.terraform.io/hashicorp/aws",
+                    "change": {
+                        "actions": ["update"],
+                        "before": {"instance_class": "db.t3.small"},
+                        "after": {"instance_class": "db.t3.medium"},
+                    },
+                },
+            ],
+        }
+        tf_file = tmp_path / "safe_plan.json"
+        tf_file.write_text(json.dumps(safe_plan))
+        runner = CliRunner()
+        result = runner.invoke(main, ["preview", "--tf", str(tf_file), "--exit-on-destroy"])
+        assert result.exit_code == 0
+
+    def test_preview_exit_on_destroy_with_destroy(self, sample_terraform_plan, tmp_path):
+        """--exit-on-destroy exits 1 when plan has destructive changes (deletes/replaces)."""
+        tf_file = tmp_path / "plan.json"
+        tf_file.write_text(json.dumps(sample_terraform_plan))
+        runner = CliRunner()
+        # terraform fixture has a delete + replace (destructive)
+        result = runner.invoke(main, ["preview", "--tf", str(tf_file), "--exit-on-destroy"])
+        assert result.exit_code == 1
+        assert "destructive" in result.output.lower()
+
+    def test_cost_threshold_under(self, sample_terraform_plan, tmp_path):
+        """--threshold exits 0 when delta is under the threshold."""
+        tf_file = tmp_path / "plan.json"
+        tf_file.write_text(json.dumps(sample_terraform_plan))
+        runner = CliRunner()
+        # Total delta for fixture is $6.50, so $1000 threshold should pass
+        result = runner.invoke(main, ["cost", "--tf", str(tf_file), "--threshold", "1000"])
+        assert result.exit_code == 0
+
+    def test_cost_threshold_exceeded(self, sample_terraform_plan, tmp_path):
+        """--threshold exits 1 when delta exceeds the threshold."""
+        tf_file = tmp_path / "plan.json"
+        tf_file.write_text(json.dumps(sample_terraform_plan))
+        runner = CliRunner()
+        # Total delta for fixture is $6.50, so $1 threshold should trigger
+        result = runner.invoke(main, ["cost", "--tf", str(tf_file), "--threshold", "1"])
+        assert result.exit_code == 1
+        assert "threshold" in result.output.lower()
