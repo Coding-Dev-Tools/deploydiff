@@ -66,8 +66,16 @@ def parse_terraform_plan(plan_json: str | dict[str, Any]) -> DeployPlan:
         # Get before/after values
         before = change.get("before", {})
         after = change.get("after", {})
-        before_sensitive = set(change.get("before_sensitive", {}).keys()) if isinstance(change.get("before_sensitive"), dict) else set()
-        after_sensitive = set(change.get("after_sensitive", {}).keys()) if isinstance(change.get("after_sensitive"), dict) else set()
+        before_sensitive = (
+            set(change.get("before_sensitive", {}).keys())
+            if isinstance(change.get("before_sensitive"), dict)
+            else set()
+        )
+        after_sensitive = (
+            set(change.get("after_sensitive", {}).keys())
+            if isinstance(change.get("after_sensitive"), dict)
+            else set()
+        )
 
         resource_change = ResourceChange(
             address=address,

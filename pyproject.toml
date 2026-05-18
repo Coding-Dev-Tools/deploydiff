@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [build-system]
 requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
@@ -37,3 +38,68 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+=======
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deploydiff"
+version = "0.1.0"
+description = "Preview infrastructure changes (Terraform, CloudFormation, Pulumi) with cost impact and rollback commands"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{name = "Revenue Holdings"}]
+
+dependencies = [
+    "click>=8.1",
+    "rich>=13.0",
+    "pyyaml>=6.0",
+]
+keywords = ["infrastructure", "terraform", "cloudformation", "pulumi", "cost", "diff", "cli"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: System :: Systems Administration",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+[project.optional-dependencies]
+license = ["revenueholdings-license>=0.1.0"]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.4.0",
+]
+
+[project.scripts]
+deploydiff = "deploydiff.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Coding-Dev-Tools/deploydiff"
+Repository = "https://github.com/Coding-Dev-Tools/deploydiff"
+Documentation = "https://github.com/Coding-Dev-Tools/deploydiff#readme"
+"Issue Tracker" = "https://github.com/Coding-Dev-Tools/deploydiff/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["*"]
+>>>>>>> 6a1c694d4432dfdcf5c2689e7113670a0a2c2e6b

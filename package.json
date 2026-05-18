@@ -1,6 +1,6 @@
 {
   "name": "deploydiff",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Compare deployment configurations across environments. Detect drift between staging and production configs.",
   "author": "Revenue Holdings <engineering@revenueholdings.dev>",
   "license": "MIT",
@@ -18,10 +18,19 @@
   "keywords": [
     "deployment",
     "diff",
+    "infrastructure",
     "devops",
-    "configuration",
+    "cost-estimation",
+    "terraform",
+    "cloudformation",
+    "kubernetes",
+    "change-preview",
+    "risk-analysis",
     "cli",
-    "infrastructure"
+    "developer-tools",
+    "gitops",
+    "deployment-safety",
+    "iac"
   ],
   "files": [
     "cli.js"

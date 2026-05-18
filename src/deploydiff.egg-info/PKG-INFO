@@ -23,6 +23,7 @@ Dynamic: license-file
 ﻿# DeployDiff CLI
 
 [![GitHub stars](https://img.shields.io/github/stars/Coding-Dev-Tools/deploydiff?style=social)](https://github.com/Coding-Dev-Tools/deploydiff/stargazers)
+[![Awesome DevOps](https://img.shields.io/badge/Awesome_DevOps-Submitted-grey?logo=github)](https://github.com/wmariuss/awesome-devops)<!-- PR #433 -->
 
 Preview infrastructure changes with human-readable diffs, cost impact estimation, and rollback commands â€” before you hit deploy.
 
@@ -45,6 +46,21 @@ Or install directly from GitHub:
 
 ```bash
 pip install git+https://github.com/Coding-Dev-Tools/deploydiff.git
+<<<<<<< HEAD
+```
+
+Or install via Homebrew (macOS/Linux):
+```bash
+brew tap Coding-Dev-Tools/tap
+brew install deploydiff
+```
+
+Or install via Scoop (Windows):
+```bash
+scoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-bucket
+scoop install deploydiff
+=======
+>>>>>>> 6a1c694d4432dfdcf5c2689e7113670a0a2c2e6b
 ```
 
 Or install via Homebrew (macOS/Linux):
@@ -58,6 +74,12 @@ Or install via Scoop (Windows):
 scoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-bucket
 scoop install deploydiff
 ```
+
+**npm (Node.js wrapper):**
+```bash
+npm install -g deploydiff
+```
+Then run: `deploydiff --help`
 
 ## Usage
 
@@ -144,6 +166,7 @@ DeployDiff is one of eight tools in the Revenue Holdings suite. One license cove
 ## License
 
 MIT
+<<<<<<< HEAD
 
 
 
@@ -154,3 +177,5 @@ npm install -g deploydiff
 ```
 
 Then run: `deploydiff --help`
+=======
+>>>>>>> 6a1c694d4432dfdcf5c2689e7113670a0a2c2e6b

@@ -34,7 +34,12 @@ def main():
 @click.option("--cfn", "cloudformation_file", type=click.Path(exists=True), help="CloudFormation change set JSON file")
 @click.option("--pulumi", "pulumi_file", type=click.Path(exists=True), help="Pulumi preview JSON file")
 @click.option("-v", "--verbose", is_flag=True, help="Show before/after details for each change")
-def preview(terraform_file, cloudformation_file, pulumi_file, verbose):
+@click.option(
+    "--exit-on-destroy",
+    is_flag=True,
+    help="Exit with code 1 if the plan contains destructive changes (deletes or replaces)",
+)
+def preview(terraform_file, cloudformation_file, pulumi_file, verbose, exit_on_destroy):
     """Preview infrastructure changes from a plan file."""
     plan = _load_plan(terraform_file, cloudformation_file, pulumi_file)
     if plan is None:
@@ -43,13 +48,26 @@ def preview(terraform_file, cloudformation_file, pulumi_file, verbose):
 
     render_plan(plan, console, verbose=verbose)
 
+    if exit_on_destroy and plan.destructive_changes:
+        console.print(
+            f"\n[red]Plan contains {len(plan.destructive_changes)} destructive change(s). "
+            f"Exiting with code 1 (--exit-on-destroy).[/red]"
+        )
+        raise SystemExit(1)
+
 
 @main.command()
 @click.option("--tf", "terraform_file", type=click.Path(exists=True), help="Terraform plan JSON file")
 @click.option("--cfn", "cloudformation_file", type=click.Path(exists=True), help="CloudFormation change set JSON file")
 @click.option("--pulumi", "pulumi_file", type=click.Path(exists=True), help="Pulumi preview JSON file")
 @click.option("--pricing", "pricing_file", type=click.Path(exists=True), help="Custom pricing JSON file")
-def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file):
+@click.option(
+    "--threshold",
+    type=float,
+    default=None,
+    help="Exit with code 1 if total monthly cost delta exceeds this value (e.g. 500 for $500)",
+)
+def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file, threshold):
     """Estimate monthly cost impact of infrastructure changes."""
     plan = _load_plan(terraform_file, cloudformation_file, pulumi_file)
     if plan is None:
@@ -58,6 +76,14 @@ def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file):
 
     estimates = estimate_costs(plan, pricing_file=pricing_file)
     _render_costs(estimates, plan, console)
+
+    if threshold is not None and plan.total_monthly_delta > threshold:
+        console.print(
+            f"\n[red]Total monthly cost increase of ${plan.total_monthly_delta:.2f} "
+            f"exceeds threshold of ${threshold:.2f}. "
+            f"Exiting with code 1 (--threshold).[/red]"
+        )
+        raise SystemExit(1)
 
 
 @main.command()
