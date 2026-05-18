@@ -1,9 +1,9 @@
-﻿# DeployDiff CLI
+# DeployDiff CLI
 
 [![GitHub stars](https://img.shields.io/github/stars/Coding-Dev-Tools/deploydiff?style=social)](https://github.com/Coding-Dev-Tools/deploydiff/stargazers)
 [![Awesome DevOps](https://img.shields.io/badge/Awesome_DevOps-Submitted-grey?logo=github)](https://github.com/wmariuss/awesome-devops)<!-- PR #433 -->
 
-Preview infrastructure changes with human-readable diffs, cost impact estimation, and rollback commands â€” before you hit deploy.
+Preview infrastructure changes with human-readable diffs, cost impact estimation, and rollback commands — before you hit deploy.
 
 [![GitHub release](https://img.shields.io/github/v/release/Coding-Dev-Tools/deploydiff?label=latest)](https://github.com/Coding-Dev-Tools/deploydiff/releases)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
@@ -12,7 +12,7 @@ Preview infrastructure changes with human-readable diffs, cost impact estimation
 [![LibHunt](https://img.shields.io/badge/LibHunt-%E2%87%92-blue?logo=codeigniter)](https://www.libhunt.com/r/Coding-Dev-Tools/deploydiff)
 [![Awesome Python](https://img.shields.io/badge/Awesome_Python-%E2%87%92-blue?logo=python)](https://github.com/uhub/awesome-python)
 
-**Why DeployDiff?** Every infrastructure change carries risk â€” wrong config, unexpected cost, unreachable state. DeployDiff gives you a clear, human-readable preview of what's about to change before Terraform, CloudFormation, or Pulumi applies it. See which resources are being created, modified, or destroyed. Estimate cost impact so surprise bills don't show up. Get rollback commands pre-generated so recovery isn't panic-mode. Supports Terraform plan JSON, CloudFormation change sets, and Pulumi previews.
+**Why DeployDiff?** Every infrastructure change carries risk — wrong config, unexpected cost, unreachable state. DeployDiff gives you a clear, human-readable preview of what's about to change before Terraform, CloudFormation, or Pulumi applies it. See which resources are being created, modified, or destroyed. Estimate cost impact so surprise bills don't show up. Get rollback commands pre-generated so recovery isn't panic-mode. Supports Terraform plan JSON, CloudFormation change sets, and Pulumi previews.
 
 ## Installation
 
@@ -92,38 +92,38 @@ deploydiff cost --tf plan.json --threshold 500 || echo "Cost increase exceeds $5
 
 ## Pricing
 
-DeployDiff is one of eight tools in the Revenue Holdings suite. One license covers all CLI tools.
+DeployDiff is one of eight tools in the DevForge suite. One license covers all CLI tools.
 
 | Plan | Price | Best For |
 |------|-------|----------|
-| **Free** | $0 | Individual devs, OSS â€” CLI only, 1 plan comparison |
-| **DeployDiff Individual** | **$15/mo** ($12 billed annually) | Professional devs â€” unlimited plans, cost estimation |
-| **Suite (all 8 tools)** | **$49/mo** ($39 billed annually) | Full Revenue Holdings toolkit â€” 40% savings |
-| **Team** | **$79/mo** ($63 billed annually) | Up to 5 devs â€” shared reports, Slack alerts |
+| **Free** | $0 | Individual devs, OSS — CLI only, 1 plan comparison |
+| **DeployDiff Individual** | **$15/mo** ($12 billed annually) | Professional devs — unlimited plans, cost estimation |
+| **Suite (all 8 tools)** | **$49/mo** ($39 billed annually) | Full DevForge toolkit — 40% savings |
+| **Team** | **$79/mo** ($63 billed annually) | Up to 5 devs — shared reports, Slack alerts |
 | **Enterprise** | Custom | SSO, RBAC, compliance reports, dedicated support |
 
-ðŸ”¹ **No lock-in**: CLI works fully offline on the free tier â€” no telemetry, no phone-home.
-ðŸ”¹ **Annual billing**: Save 20%.
+🔹 **No lock-in**: CLI works fully offline on the free tier — no telemetry, no phone-home.
+🔹 **Annual billing**: Save 20%.
 
 ### Per-Tier Features
 
 | Feature | Free | DeployDiff | Suite | Team | Enterprise |
 |---------|:----:|:----------:|:-----:|:----:|:----------:|
-| CLI: preview, cost, rollback | âœ“ | âœ“ | âœ“ | âœ“ | âœ“ |
-| Unlimited stacks | â€” | âœ“ | âœ“ | âœ“ | âœ“ |
-| Cost impact estimation | â€” | âœ“ | âœ“ | âœ“ | âœ“ |
-| Multi-provider (TF, CFN, Pulumi) | â€” | âœ“ | âœ“ | âœ“ | âœ“ |
-| Team collaboration / shared reports | â€” | â€” | â€” | âœ“ | âœ“ |
-| Slack / webhook alerts | â€” | â€” | â€” | âœ“ | âœ“ |
-| Compliance reports | â€” | â€” | â€” | â€” | âœ“ |
-| RBAC | â€” | â€” | â€” | â€” | âœ“ |
-| SSO / SAML / OIDC | â€” | â€” | â€” | â€” | âœ“ |
+| CLI: preview, cost, rollback | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Unlimited stacks | — | ✓ | ✓ | ✓ | ✓ |
+| Cost impact estimation | — | ✓ | ✓ | ✓ | ✓ |
+| Multi-provider (TF, CFN, Pulumi) | — | ✓ | ✓ | ✓ | ✓ |
+| Team collaboration / shared reports | — | — | — | ✓ | ✓ |
+| Slack / webhook alerts | — | — | — | ✓ | ✓ |
+| Compliance reports | — | — | — | — | ✓ |
+| RBAC | — | — | — | — | ✓ |
+| SSO / SAML / OIDC | — | — | — | — | ✓ |
 | Priority support | Community | 24h | 24h | 8h | Dedicated |
 
 ---
 
 <p align="center">
-  <sub>Part of <a href="https://coding-dev-tools.github.io/revenueholdings.dev/">Revenue Holdings</a> â€” CLI tools built by autonomous AI.</sub>
+  <sub>Part of <a href="https://coding-dev-tools.github.io/devforge.dev/">DevForge</a> — CLI tools built by autonomous AI.</sub>
 </p>
 
 ## License
