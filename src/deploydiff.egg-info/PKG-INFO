@@ -8,26 +8,16 @@ Project-URL: Homepage, https://github.com/Coding-Dev-Tools/deploydiff
 Project-URL: Repository, https://github.com/Coding-Dev-Tools/deploydiff
 Project-URL: Documentation, https://github.com/Coding-Dev-Tools/deploydiff#readme
 Project-URL: Issue Tracker, https://github.com/Coding-Dev-Tools/deploydiff/issues
-Keywords: infrastructure,terraform,cloudformation,pulumi,cost,diff,cli
-Classifier: Development Status :: 4 - Beta
-Classifier: Intended Audience :: Developers
-Classifier: Topic :: System :: Systems Administration
-Classifier: Programming Language :: Python :: 3
-Classifier: Programming Language :: Python :: 3.9
-Classifier: Programming Language :: Python :: 3.10
-Classifier: Programming Language :: Python :: 3.11
-Classifier: Programming Language :: Python :: 3.12
-Requires-Python: >=3.9
+Requires-Python: >=3.10
 Description-Content-Type: text/markdown
 License-File: LICENSE
 Requires-Dist: click>=8.1
 Requires-Dist: rich>=13.0
-Requires-Dist: pyyaml>=6.0
-Provides-Extra: license
-Requires-Dist: revenueholdings-license>=0.1.0; extra == "license"
 Provides-Extra: dev
 Requires-Dist: pytest>=7.0; extra == "dev"
 Requires-Dist: pytest-cov>=4.0; extra == "dev"
+Provides-Extra: licensing
+Requires-Dist: revenueholdings-license>=0.1.0; extra == "licensing"
 Dynamic: license-file
 
 ﻿# DeployDiff CLI
@@ -39,6 +29,9 @@ Preview infrastructure changes with human-readable diffs, cost impact estimation
 [![GitHub release](https://img.shields.io/github/v/release/Coding-Dev-Tools/deploydiff?label=latest)](https://github.com/Coding-Dev-Tools/deploydiff/releases)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Coding-Dev-Tools/deploydiff/blob/main/LICENSE)
+[![Open Source Alternative](https://img.shields.io/badge/Open_Source_Alternative-%E2%87%92-blue?logo=opensourceinitiative)](https://www.opensourcealternative.to/project/deploydiff)
+[![LibHunt](https://img.shields.io/badge/LibHunt-%E2%87%92-blue?logo=codeigniter)](https://www.libhunt.com/r/Coding-Dev-Tools/deploydiff)
+[![Awesome Python](https://img.shields.io/badge/Awesome_Python-%E2%87%92-blue?logo=python)](https://github.com/uhub/awesome-python)
 
 **Why DeployDiff?** Every infrastructure change carries risk â€” wrong config, unexpected cost, unreachable state. DeployDiff gives you a clear, human-readable preview of what's about to change before Terraform, CloudFormation, or Pulumi applies it. See which resources are being created, modified, or destroyed. Estimate cost impact so surprise bills don't show up. Get rollback commands pre-generated so recovery isn't panic-mode. Supports Terraform plan JSON, CloudFormation change sets, and Pulumi previews.
 
@@ -52,7 +45,18 @@ Or install directly from GitHub:
 
 ```bash
 pip install git+https://github.com/Coding-Dev-Tools/deploydiff.git
-Or install via Homebrew (macOS/Linux):```bashbrew tap Coding-Dev-Tools/tapbrew install deploydiff```Or install via Scoop (Windows):```bashscoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-bucketscoop install deploydiff```
+```
+
+Or install via Homebrew (macOS/Linux):
+```bash
+brew tap Coding-Dev-Tools/tap
+brew install deploydiff
+```
+
+Or install via Scoop (Windows):
+```bash
+scoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-bucket
+scoop install deploydiff
 ```
 
 ## Usage
@@ -141,3 +145,12 @@ DeployDiff is one of eight tools in the Revenue Holdings suite. One license cove
 
 MIT
 
+
+
+## Install via npm
+
+```bash
+npm install -g deploydiff
+```
+
+Then run: `deploydiff --help`
