@@ -44,14 +44,19 @@ scoop install deploydiff
 deploydiff preview --tf plan.json
 deploydiff preview --cfn changeset.json
 deploydiff preview --pulumi preview.json
+deploydiff preview --tf plan.json -v  # verbose: before/after details
 
 # Estimate cost impact
 deploydiff cost --tf plan.json
 deploydiff cost --cfn changeset.json
+deploydiff cost --tf plan.json --pricing custom-pricing.json
 
 # Generate rollback commands
 deploydiff rollback --tf plan.json
 deploydiff rollback --cfn changeset.json
+
+# Run as MCP server (for AI agent integration)
+deploydiff mcp
 ```
 
 ### What You Get With `preview`
@@ -73,14 +78,36 @@ deploydiff rollback --cfn changeset.json
 - **Provider-specific**: correct syntax for Terraform, CloudFormation
 - **No manual command construction**: eliminates panic-mode mistakes
 
+## MCP Server Mode
+
+DeployDiff can run as an MCP (Model Context Protocol) server, letting AI coding agents like Claude Code and Cursor interact with your infrastructure diffs directly:
+
+```bash
+# Start MCP server (requires click-to-mcp)
+deploydiff mcp
+```
+
 ## CI/CD Integration
 
 ```bash
-# Preview changes in CI, gate on destructive actions
-deploydiff preview --tf plan.json --exit-on-destroy || echo "Contains destructive changes!"
+# Preview changes in CI pipeline
+deploydiff preview --tf plan.json
 
-# Add cost check to your deployment pipeline
-deploydiff cost --tf plan.json --threshold 500 || echo "Cost increase exceeds $500!"
+# Check cost impact before deploy
+deploydiff cost --tf plan.json
+
+# Generate rollback commands for rapid recovery
+deploydiff rollback --tf plan.json
+```
+
+Combine with shell scripting for pipeline gating:
+
+```bash
+# Gate on destructive changes (check preview output for destroy actions)
+deploydiff preview --tf plan.json | grep -q "destroy" && echo "WARNING: Contains destructive changes!"
+
+# Check cost impact (use --pricing for custom pricing data)
+deploydiff cost --tf plan.json --pricing custom-pricing.json
 ```
 
 ## Pricing
@@ -91,7 +118,7 @@ DeployDiff is one of eight tools in the Revenue Holdings suite. One license cove
 |------|-------|----------|
 | **Free** | $0 | Individual devs, OSS â€” CLI only, 1 plan comparison |
 | **DeployDiff Individual** | **$15/mo** ($12 billed annually) | Professional devs â€” unlimited plans, cost estimation |
-| **Suite (all 8 tools)** | **$49/mo** ($39 billed annually) | Full Revenue Holdings toolkit â€” 40% savings |
+| **Suite (all 11 tools)** | **$49/mo** ($39 billed annually) | Full Revenue Holdings toolkit â€” 40% savings |
 | **Team** | **$79/mo** ($63 billed annually) | Up to 5 devs â€” shared reports, Slack alerts |
 | **Enterprise** | Custom | SSO, RBAC, compliance reports, dedicated support |
 
@@ -122,13 +149,3 @@ DeployDiff is one of eight tools in the Revenue Holdings suite. One license cove
 ## License
 
 MIT
-
-
-
-## Install via npm
-
-```bash
-npm install -g deploydiff
-```
-
-Then run: `deploydiff --help`
