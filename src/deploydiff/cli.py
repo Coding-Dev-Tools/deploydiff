@@ -112,8 +112,8 @@ def mcp():
     try:
         from click_to_mcp import serve_stdio
     except ImportError:
-        typer.echo("Error: click-to-mcp is required for MCP support. Install with: pip install click-to-mcp", err=True)
-        raise typer.Exit(code=1)
+        print("Error: click-to-mcp is required for MCP support. Install with: pip install click-to-mcp")
+        raise SystemExit(1) from None
     serve_stdio(main, name="deploydiff")
 
 
@@ -144,8 +144,8 @@ def _load_plan(
 
 def _render_costs(estimates: list[CostEstimate], plan: DeployPlan, console: Console) -> None:
     """Render cost estimates to the console."""
-    from rich.table import Table
     from rich import box
+    from rich.table import Table
 
     table = Table(title="Cost Impact Estimate", box=box.ROUNDED, show_header=True)
     table.add_column("Resource", style="bold")
