@@ -15,12 +15,6 @@ Preview infrastructure changes with human-readable diffs, cost impact estimation
 ## Installation
 
 ```bash
-pip install deploydiff
-```
-
-Or install directly from GitHub:
-
-```bash
 pip install git+https://github.com/Coding-Dev-Tools/deploydiff.git
 ```
 
