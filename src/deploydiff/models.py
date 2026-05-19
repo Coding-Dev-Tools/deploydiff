@@ -110,7 +110,7 @@ class DeployPlan:
 
     @property
     def deletes(self) -> list[ResourceChange]:
-        return [c for c in self.changes if c.is_destructive]
+        return [c for c in self.changes if c.action == ChangeAction.DELETE]
 
     @property
     def total_monthly_delta(self) -> float:

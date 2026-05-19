@@ -1,9 +1,11 @@
 click>=8.1
 rich>=13.0
+pyyaml>=6.0
 
 [dev]
 pytest>=7.0
 pytest-cov>=4.0
+ruff>=0.4.0
 
-[licensing]
+[license]
 revenueholdings-license>=0.1.0
