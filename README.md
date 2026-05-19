@@ -92,13 +92,13 @@ deploydiff cost --tf plan.json --threshold 500 || echo "Cost increase exceeds $5
 
 ## Pricing
 
-DeployDiff is one of eight tools in the DevForge suite. One license covers all CLI tools.
+DeployDiff is one of 11 tools in the DevForge suite. One license covers all CLI tools.
 
 | Plan | Price | Best For |
 |------|-------|----------|
 | **Free** | $0 | Individual devs, OSS — CLI only, 1 plan comparison |
 | **DeployDiff Individual** | **$15/mo** ($12 billed annually) | Professional devs — unlimited plans, cost estimation |
-| **Suite (all 8 tools)** | **$49/mo** ($39 billed annually) | Full DevForge toolkit — 40% savings |
+| **Suite (all 11 tools)** | **$49/mo** ($39 billed annually) | Full DevForge toolkit — 40% savings |
 | **Team** | **$79/mo** ($63 billed annually) | Up to 5 devs — shared reports, Slack alerts |
 | **Enterprise** | Custom | SSO, RBAC, compliance reports, dedicated support |
 
