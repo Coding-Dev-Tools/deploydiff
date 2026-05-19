@@ -9,7 +9,17 @@ Preview infrastructure changes with human-readable diffs, cost impact estimation
 [![GitHub release](https://img.shields.io/github/v/release/Coding-Dev-Tools/deploydiff?label=latest)](https://github.com/Coding-Dev-Tools/deploydiff/releases)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Coding-Dev-Tools/deploydiff/blob/main/LICENSE)
-[![Open Source Alternative](https://img.shields.io/badge/Open_Source_Alternative-%E2%87%92-blue?logo=opensourceinitiative)](https://www.opensourcealternative.to/project/deploydiff)
+|[![Open Source Alternative](https://img.shields.io/badge/Open_Source_Alternative-%E2%87%92-blue?logo=opensourceinitiative)](https://www.opensourcealternative.to/project/deploydiff)
+[![CI](https://github.com/Coding-Dev-Tools/deploydiff/actions/workflows/ci.yml/badge.svg)](https://github.com/Coding-Dev-Tools/deploydiff/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/deploydiff)](https://pypi.org/project/deploydiff/)
+
+
+
+Real-world scenarios:
+- **CI/CD gating**: Gate deploys on cost thresholds or destructive changes — no more surprise $1000 bills
+- **Pre-deploy review**: Send a readable diff to your team instead of raw `terraform plan` output
+- **Cost governance**: Compare before/after costs per resource before approving any infrastructure change
+- **Incident recovery**: Generate rollback commands instantly instead of hand-typing reverse plans
 
 ## Installation
 
@@ -104,13 +114,13 @@ deploydiff cost --tf plan.json --pricing custom-pricing.json
 
 ## Pricing
 
-DeployDiff is one of 11 tools in the DevForge suite. One license covers all CLI tools.
+DeployDiff is one of 11 tools in the Revenue Holdings suite. One license covers all CLI tools.
 
 | Plan | Price | Best For |
 |------|-------|----------|
 | **Free** | $0 | Individual devs, OSS — CLI only, 1 plan comparison |
 | **DeployDiff Individual** | **$15/mo** ($12 billed annually) | Professional devs — unlimited plans, cost estimation |
-| **Suite (all 11 tools)** | **$49/mo** ($39 billed annually) | Full DevForge toolkit — 40% savings |
+| **Suite (all 11 tools)** | **$49/mo** ($39 billed annually) | Full Revenue Holdings toolkit — 40% savings |
 | **Team** | **$79/mo** ($63 billed annually) | Up to 5 devs — shared reports, Slack alerts |
 | **Enterprise** | Custom | SSO, RBAC, compliance reports, dedicated support |
 
