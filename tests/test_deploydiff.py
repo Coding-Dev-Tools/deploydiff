@@ -195,6 +195,15 @@ class TestDeployPlan:
         plan = parse_terraform_plan(sample_terraform_plan)
         assert len(plan.destructive_changes) >= 1
 
+    def test_deletes_returns_only_delete_actions(self, sample_terraform_plan):
+        """deletes property returns only DELETE actions, not all destructive."""
+        plan = parse_terraform_plan(sample_terraform_plan)
+        # Terraform fixture has 1 DELETE + 1 CREATE_BEFORE_DELETE (destructive)
+        for change in plan.deletes:
+            assert change.action == ChangeAction.DELETE
+        # destructive_changes includes both DELETE and CREATE_BEFORE_DELETE
+        assert len(plan.destructive_changes) > len(plan.deletes)
+
     def test_total_monthly_delta(self):
         est1 = CostEstimate("a", monthly_cost_after=10.0, monthly_cost_before=5.0)
         est2 = CostEstimate("b", monthly_cost_after=20.0, monthly_cost_before=30.0)
