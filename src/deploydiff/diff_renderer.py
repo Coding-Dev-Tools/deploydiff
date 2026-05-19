@@ -76,15 +76,15 @@ def _render_summary(plan: DeployPlan, console: Console) -> None:
 
     creates = len(plan.creates)
     updates = len(plan.updates)
-    destructive = len(plan.destructive_changes)
+    deletes = len(plan.deletes)
     total = len(plan.changes)
 
     if creates:
         table.add_row("[green]+ Create[/green]", str(creates))
     if updates:
         table.add_row("[yellow]~ Update[/yellow]", str(updates))
-    if destructive:
-        table.add_row("[red]- Delete/Replace[/red]", str(destructive))
+    if deletes:
+        table.add_row("[red]- Delete/Replace[/red]", str(deletes))
 
     table.add_row("[bold]Total[/bold]", f"[bold]{total}[/bold]")
 

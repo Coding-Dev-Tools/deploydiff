@@ -8,55 +8,59 @@ Project-URL: Homepage, https://github.com/Coding-Dev-Tools/deploydiff
 Project-URL: Repository, https://github.com/Coding-Dev-Tools/deploydiff
 Project-URL: Documentation, https://github.com/Coding-Dev-Tools/deploydiff#readme
 Project-URL: Issue Tracker, https://github.com/Coding-Dev-Tools/deploydiff/issues
-Keywords: infrastructure,terraform,cloudformation,pulumi,cost,diff,cli
-Classifier: Development Status :: 4 - Beta
-Classifier: Intended Audience :: Developers
-Classifier: Topic :: System :: Systems Administration
-Classifier: Programming Language :: Python :: 3
-Classifier: Programming Language :: Python :: 3.10
-Classifier: Programming Language :: Python :: 3.11
-Classifier: Programming Language :: Python :: 3.12
 Requires-Python: >=3.10
 Description-Content-Type: text/markdown
 License-File: LICENSE
 Requires-Dist: click>=8.1
 Requires-Dist: rich>=13.0
-Requires-Dist: pyyaml>=6.0
-Provides-Extra: license
-Requires-Dist: revenueholdings-license>=0.1.0; extra == "license"
 Provides-Extra: dev
 Requires-Dist: pytest>=7.0; extra == "dev"
 Requires-Dist: pytest-cov>=4.0; extra == "dev"
-Requires-Dist: ruff>=0.4.0; extra == "dev"
+Provides-Extra: licensing
+Requires-Dist: revenueholdings-license>=0.1.0; extra == "licensing"
 Dynamic: license-file
 
-# DeployDiff CLI
+﻿# DeployDiff CLI
 
 [![GitHub stars](https://img.shields.io/github/stars/Coding-Dev-Tools/deploydiff?style=social)](https://github.com/Coding-Dev-Tools/deploydiff/stargazers)
+[![Awesome DevOps](https://img.shields.io/badge/Awesome_DevOps-Submitted-grey?logo=github)](https://github.com/wmariuss/awesome-devops)<!-- PR #433 -->
 
-Preview infrastructure changes with human-readable diffs, cost impact estimation, and rollback commands — before you hit deploy.
-
-> ⭐ **Star this repo** if you manage infrastructure — it helps other devs find DeployDiff!
+Preview infrastructure changes with human-readable diffs, cost impact estimation, and rollback commands â€” before you hit deploy.
 
 [![GitHub release](https://img.shields.io/github/v/release/Coding-Dev-Tools/deploydiff?label=latest)](https://github.com/Coding-Dev-Tools/deploydiff/releases)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Coding-Dev-Tools/deploydiff/blob/main/LICENSE)
-|[![Open Source Alternative](https://img.shields.io/badge/Open_Source_Alternative-%E2%87%92-blue?logo=opensourceinitiative)](https://www.opensourcealternative.to/project/deploydiff)
-[![CI](https://github.com/Coding-Dev-Tools/deploydiff/actions/workflows/ci.yml/badge.svg)](https://github.com/Coding-Dev-Tools/deploydiff/actions/workflows/ci.yml)
-[![PyPI](https://img.shields.io/pypi/v/deploydiff)](https://pypi.org/project/deploydiff/)
+[![Open Source Alternative](https://img.shields.io/badge/Open_Source_Alternative-%E2%87%92-blue?logo=opensourceinitiative)](https://www.opensourcealternative.to/project/deploydiff)
+[![LibHunt](https://img.shields.io/badge/LibHunt-%E2%87%92-blue?logo=codeigniter)](https://www.libhunt.com/r/Coding-Dev-Tools/deploydiff)
+[![Awesome Python](https://img.shields.io/badge/Awesome_Python-%E2%87%92-blue?logo=python)](https://github.com/uhub/awesome-python)
 
-
-
-Real-world scenarios:
-- **CI/CD gating**: Gate deploys on cost thresholds or destructive changes — no more surprise $1000 bills
-- **Pre-deploy review**: Send a readable diff to your team instead of raw `terraform plan` output
-- **Cost governance**: Compare before/after costs per resource before approving any infrastructure change
-- **Incident recovery**: Generate rollback commands instantly instead of hand-typing reverse plans
+**Why DeployDiff?** Every infrastructure change carries risk â€” wrong config, unexpected cost, unreachable state. DeployDiff gives you a clear, human-readable preview of what's about to change before Terraform, CloudFormation, or Pulumi applies it. See which resources are being created, modified, or destroyed. Estimate cost impact so surprise bills don't show up. Get rollback commands pre-generated so recovery isn't panic-mode. Supports Terraform plan JSON, CloudFormation change sets, and Pulumi previews.
 
 ## Installation
 
 ```bash
+pip install deploydiff
+```
+
+Or install directly from GitHub:
+
+```bash
 pip install git+https://github.com/Coding-Dev-Tools/deploydiff.git
+<<<<<<< HEAD
+```
+
+Or install via Homebrew (macOS/Linux):
+```bash
+brew tap Coding-Dev-Tools/tap
+brew install deploydiff
+```
+
+Or install via Scoop (Windows):
+```bash
+scoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-bucket
+scoop install deploydiff
+=======
+>>>>>>> 6a1c694d4432dfdcf5c2689e7113670a0a2c2e6b
 ```
 
 Or install via Homebrew (macOS/Linux):
@@ -71,6 +75,12 @@ scoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-buck
 scoop install deploydiff
 ```
 
+**npm (Node.js wrapper):**
+```bash
+npm install -g deploydiff
+```
+Then run: `deploydiff --help`
+
 ## Usage
 
 ```bash
@@ -78,19 +88,14 @@ scoop install deploydiff
 deploydiff preview --tf plan.json
 deploydiff preview --cfn changeset.json
 deploydiff preview --pulumi preview.json
-deploydiff preview --tf plan.json -v  # verbose: before/after details
 
 # Estimate cost impact
 deploydiff cost --tf plan.json
 deploydiff cost --cfn changeset.json
-deploydiff cost --tf plan.json --pricing custom-pricing.json
 
 # Generate rollback commands
 deploydiff rollback --tf plan.json
 deploydiff rollback --cfn changeset.json
-
-# Run as MCP server (for AI agent integration)
-deploydiff mcp
 ```
 
 ### What You Get With `preview`
@@ -112,74 +117,65 @@ deploydiff mcp
 - **Provider-specific**: correct syntax for Terraform, CloudFormation
 - **No manual command construction**: eliminates panic-mode mistakes
 
-## MCP Server Mode
-
-DeployDiff can run as an MCP (Model Context Protocol) server, letting AI coding agents like Claude Code and Cursor interact with your infrastructure diffs directly:
-
-```bash
-# Start MCP server (requires click-to-mcp)
-deploydiff mcp
-```
-
 ## CI/CD Integration
 
 ```bash
-# Preview changes in CI pipeline
-deploydiff preview --tf plan.json
+# Preview changes in CI, gate on destructive actions
+deploydiff preview --tf plan.json --exit-on-destroy || echo "Contains destructive changes!"
 
-# Check cost impact before deploy
-deploydiff cost --tf plan.json
-
-# Generate rollback commands for rapid recovery
-deploydiff rollback --tf plan.json
-```
-
-Combine with shell scripting for pipeline gating:
-
-```bash
-# Gate on destructive changes (check preview output for destroy actions)
-deploydiff preview --tf plan.json | grep -q "destroy" && echo "WARNING: Contains destructive changes!"
-
-# Check cost impact (use --pricing for custom pricing data)
-deploydiff cost --tf plan.json --pricing custom-pricing.json
+# Add cost check to your deployment pipeline
+deploydiff cost --tf plan.json --threshold 500 || echo "Cost increase exceeds $500!"
 ```
 
 ## Pricing
 
-DeployDiff is one of 11 tools in the Revenue Holdings suite. One license covers all CLI tools.
+DeployDiff is one of eight tools in the Revenue Holdings suite. One license covers all CLI tools.
 
 | Plan | Price | Best For |
 |------|-------|----------|
-| **Free** | $0 | Individual devs, OSS — CLI only, 1 plan comparison |
-| **DeployDiff Individual** | **$15/mo** ($12 billed annually) | Professional devs — unlimited plans, cost estimation |
-| **Suite (all 11 tools)** | **$49/mo** ($39 billed annually) | Full Revenue Holdings toolkit — 40% savings |
-| **Team** | **$79/mo** ($63 billed annually) | Up to 5 devs — shared reports, Slack alerts |
+| **Free** | $0 | Individual devs, OSS â€” CLI only, 1 plan comparison |
+| **DeployDiff Individual** | **$15/mo** ($12 billed annually) | Professional devs â€” unlimited plans, cost estimation |
+| **Suite (all 8 tools)** | **$49/mo** ($39 billed annually) | Full Revenue Holdings toolkit â€” 40% savings |
+| **Team** | **$79/mo** ($63 billed annually) | Up to 5 devs â€” shared reports, Slack alerts |
 | **Enterprise** | Custom | SSO, RBAC, compliance reports, dedicated support |
 
-🔹 **No lock-in**: CLI works fully offline on the free tier — no telemetry, no phone-home.
-🔹 **Annual billing**: Save 20%.
+ðŸ”¹ **No lock-in**: CLI works fully offline on the free tier â€” no telemetry, no phone-home.
+ðŸ”¹ **Annual billing**: Save 20%.
 
 ### Per-Tier Features
 
 | Feature | Free | DeployDiff | Suite | Team | Enterprise |
 |---------|:----:|:----------:|:-----:|:----:|:----------:|
-| CLI: preview, cost, rollback | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Unlimited stacks | — | ✓ | ✓ | ✓ | ✓ |
-| Cost impact estimation | — | ✓ | ✓ | ✓ | ✓ |
-| Multi-provider (TF, CFN, Pulumi) | — | ✓ | ✓ | ✓ | ✓ |
-| Team collaboration / shared reports | — | — | — | ✓ | ✓ |
-| Slack / webhook alerts | — | — | — | ✓ | ✓ |
-| Compliance reports | — | — | — | — | ✓ |
-| RBAC | — | — | — | — | ✓ |
-| SSO / SAML / OIDC | — | — | — | — | ✓ |
+| CLI: preview, cost, rollback | âœ“ | âœ“ | âœ“ | âœ“ | âœ“ |
+| Unlimited stacks | â€” | âœ“ | âœ“ | âœ“ | âœ“ |
+| Cost impact estimation | â€” | âœ“ | âœ“ | âœ“ | âœ“ |
+| Multi-provider (TF, CFN, Pulumi) | â€” | âœ“ | âœ“ | âœ“ | âœ“ |
+| Team collaboration / shared reports | â€” | â€” | â€” | âœ“ | âœ“ |
+| Slack / webhook alerts | â€” | â€” | â€” | âœ“ | âœ“ |
+| Compliance reports | â€” | â€” | â€” | â€” | âœ“ |
+| RBAC | â€” | â€” | â€” | â€” | âœ“ |
+| SSO / SAML / OIDC | â€” | â€” | â€” | â€” | âœ“ |
 | Priority support | Community | 24h | 24h | 8h | Dedicated |
 
 ---
 
 <p align="center">
-  <sub>Part of <a href="https://coding-dev-tools.github.io/revenueholdings.dev/">Revenue Holdings</a> — CLI tools built by autonomous AI.</sub>
+  <sub>Part of <a href="https://coding-dev-tools.github.io/revenueholdings.dev/">Revenue Holdings</a> â€” CLI tools built by autonomous AI.</sub>
 </p>
 
 ## License
 
 MIT
+<<<<<<< HEAD
+
+
+
+## Install via npm
+
+```bash
+npm install -g deploydiff
+```
+
+Then run: `deploydiff --help`
+=======
+>>>>>>> 6a1c694d4432dfdcf5c2689e7113670a0a2c2e6b
