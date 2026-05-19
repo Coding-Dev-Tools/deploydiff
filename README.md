@@ -1,18 +1,16 @@
 # DeployDiff CLI
 
 [![GitHub stars](https://img.shields.io/github/stars/Coding-Dev-Tools/deploydiff?style=social)](https://github.com/Coding-Dev-Tools/deploydiff/stargazers)
-[![Awesome DevOps](https://img.shields.io/badge/Awesome_DevOps-Submitted-grey?logo=github)](https://github.com/wmariuss/awesome-devops)<!-- PR #433 -->
 
 Preview infrastructure changes with human-readable diffs, cost impact estimation, and rollback commands — before you hit deploy.
+
+> ⭐ **Star this repo** if you manage infrastructure — it helps other devs find DeployDiff!
 
 [![GitHub release](https://img.shields.io/github/v/release/Coding-Dev-Tools/deploydiff?label=latest)](https://github.com/Coding-Dev-Tools/deploydiff/releases)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Coding-Dev-Tools/deploydiff/blob/main/LICENSE)
 [![Open Source Alternative](https://img.shields.io/badge/Open_Source_Alternative-%E2%87%92-blue?logo=opensourceinitiative)](https://www.opensourcealternative.to/project/deploydiff)
 [![LibHunt](https://img.shields.io/badge/LibHunt-%E2%87%92-blue?logo=codeigniter)](https://www.libhunt.com/r/Coding-Dev-Tools/deploydiff)
-[![Awesome Python](https://img.shields.io/badge/Awesome_Python-%E2%87%92-blue?logo=python)](https://github.com/uhub/awesome-python)
-
-**Why DeployDiff?** Every infrastructure change carries risk — wrong config, unexpected cost, unreachable state. DeployDiff gives you a clear, human-readable preview of what's about to change before Terraform, CloudFormation, or Pulumi applies it. See which resources are being created, modified, or destroyed. Estimate cost impact so surprise bills don't show up. Get rollback commands pre-generated so recovery isn't panic-mode. Supports Terraform plan JSON, CloudFormation change sets, and Pulumi previews.
 
 ## Installation
 
@@ -38,12 +36,6 @@ scoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-buck
 scoop install deploydiff
 ```
 
-**npm (Node.js wrapper):**
-```bash
-npm install -g deploydiff
-```
-Then run: `deploydiff --help`
-
 ## Usage
 
 ```bash
@@ -51,14 +43,19 @@ Then run: `deploydiff --help`
 deploydiff preview --tf plan.json
 deploydiff preview --cfn changeset.json
 deploydiff preview --pulumi preview.json
+deploydiff preview --tf plan.json -v  # verbose: before/after details
 
 # Estimate cost impact
 deploydiff cost --tf plan.json
 deploydiff cost --cfn changeset.json
+deploydiff cost --tf plan.json --pricing custom-pricing.json
 
 # Generate rollback commands
 deploydiff rollback --tf plan.json
 deploydiff rollback --cfn changeset.json
+
+# Run as MCP server (for AI agent integration)
+deploydiff mcp
 ```
 
 ### What You Get With `preview`
@@ -80,14 +77,36 @@ deploydiff rollback --cfn changeset.json
 - **Provider-specific**: correct syntax for Terraform, CloudFormation
 - **No manual command construction**: eliminates panic-mode mistakes
 
+## MCP Server Mode
+
+DeployDiff can run as an MCP (Model Context Protocol) server, letting AI coding agents like Claude Code and Cursor interact with your infrastructure diffs directly:
+
+```bash
+# Start MCP server (requires click-to-mcp)
+deploydiff mcp
+```
+
 ## CI/CD Integration
 
 ```bash
-# Preview changes in CI, gate on destructive actions
-deploydiff preview --tf plan.json --exit-on-destroy || echo "Contains destructive changes!"
+# Preview changes in CI pipeline
+deploydiff preview --tf plan.json
 
-# Add cost check to your deployment pipeline
-deploydiff cost --tf plan.json --threshold 500 || echo "Cost increase exceeds $500!"
+# Check cost impact before deploy
+deploydiff cost --tf plan.json
+
+# Generate rollback commands for rapid recovery
+deploydiff rollback --tf plan.json
+```
+
+Combine with shell scripting for pipeline gating:
+
+```bash
+# Gate on destructive changes (check preview output for destroy actions)
+deploydiff preview --tf plan.json | grep -q "destroy" && echo "WARNING: Contains destructive changes!"
+
+# Check cost impact (use --pricing for custom pricing data)
+deploydiff cost --tf plan.json --pricing custom-pricing.json
 ```
 
 ## Pricing
@@ -123,7 +142,7 @@ DeployDiff is one of 11 tools in the DevForge suite. One license covers all CLI 
 ---
 
 <p align="center">
-  <sub>Part of <a href="https://coding-dev-tools.github.io/devforge.dev/">DevForge</a> — CLI tools built by autonomous AI.</sub>
+  <sub>Part of <a href="https://coding-dev-tools.github.io/revenueholdings.dev/">Revenue Holdings</a> — CLI tools built by autonomous AI.</sub>
 </p>
 
 ## License

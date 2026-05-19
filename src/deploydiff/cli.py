@@ -13,14 +13,6 @@ from .pulumi_parser import parse_pulumi_preview
 from .rollback import generate_rollback_commands
 from .terraform_parser import parse_terraform_plan
 
-try:
-    from revenueholdings_license import require_license
-except ImportError:
-    def require_license(tool):
-        def decorator(func):
-            return func
-        return decorator
-
 console = Console()
 
 
@@ -28,7 +20,13 @@ console = Console()
 @click.version_option(package_name="deploydiff")
 def main():
     """DeployDiff - Preview infrastructure changes with cost impact and rollback."""
-    require_license("deploydiff")
+    try:
+        from revenueholdings_license import require_license
+        require_license("deploydiff")
+    except ImportError:
+        import warnings
+        warnings.warn("revenueholdings-license not installed; license checks skipped", stacklevel=2)
+    pass
 
 
 @main.command()
@@ -36,7 +34,12 @@ def main():
 @click.option("--cfn", "cloudformation_file", type=click.Path(exists=True), help="CloudFormation change set JSON file")
 @click.option("--pulumi", "pulumi_file", type=click.Path(exists=True), help="Pulumi preview JSON file")
 @click.option("-v", "--verbose", is_flag=True, help="Show before/after details for each change")
-def preview(terraform_file, cloudformation_file, pulumi_file, verbose):
+@click.option(
+    "--exit-on-destroy",
+    is_flag=True,
+    help="Exit with code 1 if the plan contains destructive changes (deletes or replaces)",
+)
+def preview(terraform_file, cloudformation_file, pulumi_file, verbose, exit_on_destroy):
     """Preview infrastructure changes from a plan file."""
     plan = _load_plan(terraform_file, cloudformation_file, pulumi_file)
     if plan is None:
@@ -45,13 +48,26 @@ def preview(terraform_file, cloudformation_file, pulumi_file, verbose):
 
     render_plan(plan, console, verbose=verbose)
 
+    if exit_on_destroy and plan.destructive_changes:
+        console.print(
+            f"\n[red]Plan contains {len(plan.destructive_changes)} destructive change(s). "
+            f"Exiting with code 1 (--exit-on-destroy).[/red]"
+        )
+        raise SystemExit(1)
+
 
 @main.command()
 @click.option("--tf", "terraform_file", type=click.Path(exists=True), help="Terraform plan JSON file")
 @click.option("--cfn", "cloudformation_file", type=click.Path(exists=True), help="CloudFormation change set JSON file")
 @click.option("--pulumi", "pulumi_file", type=click.Path(exists=True), help="Pulumi preview JSON file")
 @click.option("--pricing", "pricing_file", type=click.Path(exists=True), help="Custom pricing JSON file")
-def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file):
+@click.option(
+    "--threshold",
+    type=float,
+    default=None,
+    help="Exit with code 1 if total monthly cost delta exceeds this value (e.g. 500 for $500)",
+)
+def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file, threshold):
     """Estimate monthly cost impact of infrastructure changes."""
     plan = _load_plan(terraform_file, cloudformation_file, pulumi_file)
     if plan is None:
@@ -60,6 +76,14 @@ def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file):
 
     estimates = estimate_costs(plan, pricing_file=pricing_file)
     _render_costs(estimates, plan, console)
+
+    if threshold is not None and plan.total_monthly_delta > threshold:
+        console.print(
+            f"\n[red]Total monthly cost increase of ${plan.total_monthly_delta:.2f} "
+            f"exceeds threshold of ${threshold:.2f}. "
+            f"Exiting with code 1 (--threshold).[/red]"
+        )
+        raise SystemExit(1)
 
 
 @main.command()
@@ -85,7 +109,11 @@ def mcp():
     AI coding agents (Claude Code, Cursor, etc.) use this to interact
     with deploydiff tools directly.
     """
-    from click_to_mcp import serve_stdio
+    try:
+        from click_to_mcp import serve_stdio
+    except ImportError:
+        typer.echo("Error: click-to-mcp is required for MCP support. Install with: pip install click-to-mcp", err=True)
+        raise typer.Exit(code=1)
     serve_stdio(main, name="deploydiff")
 
 
@@ -116,8 +144,8 @@ def _load_plan(
 
 def _render_costs(estimates: list[CostEstimate], plan: DeployPlan, console: Console) -> None:
     """Render cost estimates to the console."""
-    from rich import box
     from rich.table import Table
+    from rich import box
 
     table = Table(title="Cost Impact Estimate", box=box.ROUNDED, show_header=True)
     table.add_column("Resource", style="bold")
