@@ -9,7 +9,7 @@ Preview infrastructure changes with human-readable diffs, cost impact estimation
 [![GitHub release](https://img.shields.io/github/v/release/Coding-Dev-Tools/deploydiff?label=latest)](https://github.com/Coding-Dev-Tools/deploydiff/releases)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Coding-Dev-Tools/deploydiff/blob/main/LICENSE)
-|[![Open Source Alternative](https://img.shields.io/badge/Open_Source_Alternative-%E2%87%92-blue?logo=opensourceinitiative)](https://www.opensourcealternative.to/project/deploydiff)
+[![Open Source Alternative](https://img.shields.io/badge/Open_Source_Alternative-%E2%87%92-blue?logo=opensourceinitiative)](https://www.opensourcealternative.to/project/deploydiff)
 [![CI](https://github.com/Coding-Dev-Tools/deploydiff/actions/workflows/ci.yml/badge.svg)](https://github.com/Coding-Dev-Tools/deploydiff/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/deploydiff)](https://pypi.org/project/deploydiff/)
 
