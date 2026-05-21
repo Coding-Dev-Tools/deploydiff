@@ -555,9 +555,9 @@ class TestRenderer:
 
     def test_render_change_details_missing_data(self):
         """Render change details with no before/after should not error."""
+        from deploydiff.diff_renderer import _render_change_details
         from io import StringIO
         from rich.console import Console
-        from deploydiff.diff_renderer import _render_change_details
         change = ResourceChange(
             address="aws_instance.web",
             action=ChangeAction.CREATE,
