@@ -405,6 +405,86 @@ class TestRollback:
         commands = generate_rollback_commands(plan)
         assert "No changes to roll back" in " ".join(commands)
 
+    def test_terraform_rollback_targets_create_resources(self, sample_terraform_plan):
+        """Rollback should generate destroy commands for each created resource."""
+        plan = parse_terraform_plan(sample_terraform_plan)
+        commands = generate_rollback_commands(plan)
+        joined = " ".join(commands)
+        # The created aws_instance.web should be targeted for destroy in rollback
+        assert "aws_instance.web" in joined
+        assert "terraform destroy" in joined
+
+    def test_terraform_rollback_targets_delete_resources(self, sample_terraform_plan):
+        """Rollback should generate apply commands for each deleted resource."""
+        plan = parse_terraform_plan(sample_terraform_plan)
+        commands = generate_rollback_commands(plan)
+        joined = " ".join(commands)
+        # The deleted aws_s3_bucket.logs should be targeted for re-apply in rollback
+        assert "aws_s3_bucket.logs" in joined
+        assert "terraform apply" in joined
+
+    def test_terraform_rollback_targets_update_resources(self, sample_terraform_plan):
+        """Rollback should mention updated resources."""
+        plan = parse_terraform_plan(sample_terraform_plan)
+        commands = generate_rollback_commands(plan)
+        joined = " ".join(commands)
+        # Updated aws_db_instance.primary should be referenced
+        assert "aws_db_instance.primary" in joined
+
+    def test_terraform_rollback_full_stack_option(self, sample_terraform_plan):
+        """Rollback should include a full stack rollback option."""
+        plan = parse_terraform_plan(sample_terraform_plan)
+        commands = generate_rollback_commands(plan)
+        joined = " ".join(commands)
+        assert "terraform destroy -auto-approve" in joined
+
+    def test_cloudformation_rollback_includes_stack_name(self, sample_cfn_changeset):
+        """CloudFormation rollback commands should reference the stack name."""
+        plan = parse_cloudformation_changeset(sample_cfn_changeset)
+        commands = generate_rollback_commands(plan)
+        joined = " ".join(commands)
+        # StackName from fixture is "my-stack"
+        assert "my-stack" in joined
+        assert "rollback-stack" in joined or "delete-stack" in joined
+
+    def test_cloudformation_rollback_mentions_resource_addresses(self, sample_cfn_changeset):
+        """CloudFormation rollback should reference changed resource addresses."""
+        plan = parse_cloudformation_changeset(sample_cfn_changeset)
+        commands = generate_rollback_commands(plan)
+        joined = " ".join(commands)
+        # Logical resource IDs from fixture: WebServer, MyDB, LogBucket, AppServer
+        assert "WebServer" in joined or "AppServer" in joined
+
+    def test_pulumi_rollback_mentions_resource_addresses(self, sample_pulumi_preview):
+        """Pulumi rollback should reference changed resource URNs."""
+        plan = parse_pulumi_preview(sample_pulumi_preview)
+        commands = generate_rollback_commands(plan)
+        joined = " ".join(commands)
+        # Should mention specific resource URNs from fixture
+        assert "my-bucket" in joined or "web-server" in joined
+
+    def test_pulumi_rollback_includes_cancel_and_history(self, sample_pulumi_preview):
+        """Pulumi rollback should include cancel and stack history options."""
+        plan = parse_pulumi_preview(sample_pulumi_preview)
+        commands = generate_rollback_commands(plan)
+        joined = " ".join(commands)
+        assert "pulumi cancel" in joined
+        assert "pulumi stack history" in joined or "stack history" in joined
+
+    def test_terraform_rollback_no_changes_message(self):
+        """Terraform rollback with no changes shows appropriate message."""
+        plan = DeployPlan(source=ChangeSource.TERRAFORM, changes=[])
+        commands = generate_rollback_commands(plan)
+        assert "No changes to roll back" in " ".join(commands)
+
+    def test_cloudformation_rollback_fallback_stack_name(self):
+        """CloudFormation rollback uses fallback stack name when raw_data is missing."""
+        plan = DeployPlan(source=ChangeSource.CLOUDFORMATION, changes=[], raw_data=None)
+        commands = generate_rollback_commands(plan)
+        joined = " ".join(commands)
+        # Should use fallback STACK_NAME
+        assert "STACK_NAME" in joined
+
 
 # ── Renderer Tests ────────────────────────────────────────────────────────
 
