@@ -195,6 +195,15 @@ class TestDeployPlan:
         plan = parse_terraform_plan(sample_terraform_plan)
         assert len(plan.destructive_changes) >= 1
 
+    def test_deletes_returns_only_delete_actions(self, sample_terraform_plan):
+        """deletes property returns only DELETE actions, not all destructive."""
+        plan = parse_terraform_plan(sample_terraform_plan)
+        # Terraform fixture has 1 DELETE + 1 CREATE_BEFORE_DELETE (destructive)
+        for change in plan.deletes:
+            assert change.action == ChangeAction.DELETE
+        # destructive_changes includes both DELETE and CREATE_BEFORE_DELETE
+        assert len(plan.destructive_changes) > len(plan.deletes)
+
     def test_total_monthly_delta(self):
         est1 = CostEstimate("a", monthly_cost_after=10.0, monthly_cost_before=5.0)
         est2 = CostEstimate("b", monthly_cost_after=20.0, monthly_cost_before=30.0)
@@ -740,7 +749,33 @@ class TestCLI:
         assert result.exit_code == 1
         assert "threshold" in result.output.lower()
 
+    # ── Missing CLI edge-case tests ─────────────────────────────────
+
+    def test_preview_multiple_sources(self, sample_terraform_plan, sample_cfn_changeset, tmp_path):
+        """Preview exits 1 when multiple source files are provided."""
+        tf_file = tmp_path / "plan.json"
+        cfn_file = tmp_path / "changeset.json"
+        tf_file.write_text(json.dumps(sample_terraform_plan))
+        cfn_file.write_text(json.dumps(sample_cfn_changeset))
+        runner = CliRunner()
+        result = runner.invoke(main, ["preview", "--tf", str(tf_file), "--cfn", str(cfn_file)])
+        assert result.exit_code == 1
+        assert "only one" in result.output.lower()
+
+    def test_cost_no_args(self):
+        """Cost exits 1 when no source file is provided."""
+        runner = CliRunner()
+        result = runner.invoke(main, ["cost"])
+        assert result.exit_code != 0
+
+    def test_rollback_no_args(self):
+        """Rollback exits 1 when no source file is provided."""
+        runner = CliRunner()
+        result = runner.invoke(main, ["rollback"])
+        assert result.exit_code != 0
+
     def test_preview_pulumi(self, sample_pulumi_preview, tmp_path):
+        """Preview with --pulumi exits 0 and shows output."""
         pulumi_file = tmp_path / "preview.json"
         pulumi_file.write_text(json.dumps(sample_pulumi_preview))
         runner = CliRunner()
@@ -749,6 +784,7 @@ class TestCLI:
         assert "Change Summary" in result.output
 
     def test_cost_pulumi(self, sample_pulumi_preview, tmp_path):
+        """Cost with --pulumi exits 0 and shows cost impact."""
         pulumi_file = tmp_path / "preview.json"
         pulumi_file.write_text(json.dumps(sample_pulumi_preview))
         runner = CliRunner()
@@ -756,15 +792,34 @@ class TestCLI:
         assert result.exit_code == 0
         assert "Cost Impact" in result.output
 
-    def test_preview_multiple_sources(self, sample_terraform_plan, sample_cfn_changeset, tmp_path):
-        tf_file = tmp_path / "plan.json"
+    def test_rollback_cfn(self, sample_cfn_changeset, tmp_path):
+        """Rollback with --cfn exits 0."""
         cfn_file = tmp_path / "changeset.json"
-        tf_file.write_text(json.dumps(sample_terraform_plan))
         cfn_file.write_text(json.dumps(sample_cfn_changeset))
         runner = CliRunner()
-        result = runner.invoke(main, ["preview", "--tf", str(tf_file), "--cfn", str(cfn_file)])
-        assert result.exit_code != 0
-        assert "only one" in result.output.lower()
+        result = runner.invoke(main, ["rollback", "--cfn", str(cfn_file)])
+        assert result.exit_code == 0
+        assert "cloudformation" in result.output.lower() or "aws" in result.output.lower()
+
+    def test_cost_help(self):
+        """Cost --help shows expected options."""
+        runner = CliRunner()
+        result = runner.invoke(main, ["cost", "--help"])
+        assert result.exit_code == 0
+        assert "--tf" in result.output
+        assert "--cfn" in result.output
+        assert "--pulumi" in result.output
+        assert "--pricing" in result.output
+        assert "--threshold" in result.output
+
+    def test_rollback_help(self):
+        """Rollback --help shows expected options."""
+        runner = CliRunner()
+        result = runner.invoke(main, ["rollback", "--help"])
+        assert result.exit_code == 0
+        assert "--tf" in result.output
+        assert "--cfn" in result.output
+        assert "--pulumi" in result.output
 
 
 # ── Terraform Parser Additional Tests ────────────────────────────────────

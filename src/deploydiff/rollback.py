@@ -39,8 +39,8 @@ def _terraform_rollback(plan: DeployPlan) -> list[str]:
             f"terraform destroy -target={change.address} -auto-approve"
         )
 
-    # For each delete, we need to re-apply it
-    for change in plan.deletes:
+    # For each destructive change (delete/replace), we need to re-apply it
+    for change in plan.destructive_changes:
         commands.append(
             f"terraform apply -target={change.address} -auto-approve"
         )
@@ -85,9 +85,9 @@ def _cloudformation_rollback(plan: DeployPlan) -> list[str]:
             f"# Rollback create: remove {change.address}"
         )
 
-    for change in plan.deletes:
+    for change in plan.destructive_changes:
         commands.append(
-            f"# Rollback delete: re-create {change.address}"
+            f"# Rollback delete/replace: re-create {change.address}"
         )
 
     commands.append("")
@@ -128,8 +128,8 @@ def _pulumi_rollback(plan: DeployPlan) -> list[str]:
         commands.append(f"# Revert updated resource: {change.address}")
         commands.append(f"pulumi up -t {change.address} --yes  # with reverted code")
 
-    for change in plan.deletes:
-        commands.append(f"# Recreate deleted resource: {change.address}")
+    for change in plan.destructive_changes:
+        commands.append(f"# Recreate deleted/replaced resource: {change.address}")
         commands.append(f"pulumi up -t {change.address} --yes  # with original code")
 
     return commands
