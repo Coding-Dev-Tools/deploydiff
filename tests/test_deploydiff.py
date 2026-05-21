@@ -739,3 +739,202 @@ class TestCLI:
         result = runner.invoke(main, ["cost", "--tf", str(tf_file), "--threshold", "1"])
         assert result.exit_code == 1
         assert "threshold" in result.output.lower()
+
+    def test_preview_pulumi(self, sample_pulumi_preview, tmp_path):
+        pulumi_file = tmp_path / "preview.json"
+        pulumi_file.write_text(json.dumps(sample_pulumi_preview))
+        runner = CliRunner()
+        result = runner.invoke(main, ["preview", "--pulumi", str(pulumi_file)])
+        assert result.exit_code == 0
+        assert "Change Summary" in result.output
+
+    def test_cost_pulumi(self, sample_pulumi_preview, tmp_path):
+        pulumi_file = tmp_path / "preview.json"
+        pulumi_file.write_text(json.dumps(sample_pulumi_preview))
+        runner = CliRunner()
+        result = runner.invoke(main, ["cost", "--pulumi", str(pulumi_file)])
+        assert result.exit_code == 0
+        assert "Cost Impact" in result.output
+
+    def test_preview_multiple_sources(self, sample_terraform_plan, sample_cfn_changeset, tmp_path):
+        tf_file = tmp_path / "plan.json"
+        cfn_file = tmp_path / "changeset.json"
+        tf_file.write_text(json.dumps(sample_terraform_plan))
+        cfn_file.write_text(json.dumps(sample_cfn_changeset))
+        runner = CliRunner()
+        result = runner.invoke(main, ["preview", "--tf", str(tf_file), "--cfn", str(cfn_file)])
+        assert result.exit_code != 0
+        assert "only one" in result.output.lower()
+
+
+# ── Terraform Parser Additional Tests ────────────────────────────────────
+
+class TestTerraformParserExtended:
+    def test_parse_noop_action(self):
+        data = {
+            "format_version": "1.2",
+            "resource_changes": [
+                {
+                    "address": "data.aws_ami.ubuntu",
+                    "type": "aws_ami",
+                    "name": "ubuntu",
+                    "provider_name": "registry.terraform.io/hashicorp/aws",
+                    "change": {"actions": ["no-op"], "before": {}, "after": {}},
+                }
+            ],
+        }
+        plan = parse_terraform_plan(data)
+        assert len(plan.changes) == 1
+        assert plan.changes[0].action == ChangeAction.NO_OP
+
+    def test_parse_read_action(self):
+        data = {
+            "format_version": "1.2",
+            "resource_changes": [
+                {
+                    "address": "data.aws_caller_identity.current",
+                    "type": "aws_caller_identity",
+                    "name": "current",
+                    "provider_name": "registry.terraform.io/hashicorp/aws",
+                    "change": {"actions": ["read"], "before": None, "after": {}},
+                }
+            ],
+        }
+        plan = parse_terraform_plan(data)
+        assert len(plan.changes) == 1
+        assert plan.changes[0].action == ChangeAction.READ
+
+    def test_parse_delete_before_create(self):
+        data = {
+            "format_version": "1.2",
+            "resource_changes": [
+                {
+                    "address": "aws_instance.replaced",
+                    "type": "aws_instance",
+                    "name": "replaced",
+                    "provider_name": "registry.terraform.io/hashicorp/aws",
+                    "change": {
+                        "actions": ["delete", "create"],
+                        "before": {"instance_type": "t3.micro"},
+                        "after": {"instance_type": "t3.large"},
+                    },
+                }
+            ],
+        }
+        plan = parse_terraform_plan(data)
+        assert len(plan.changes) == 1
+        # Both (delete, create) and (create, delete) resolve to CREATE_BEFORE_DELETE
+        assert plan.changes[0].action == ChangeAction.CREATE_BEFORE_DELETE
+
+    def test_parse_empty_actions(self):
+        data = {
+            "format_version": "1.2",
+            "resource_changes": [
+                {
+                    "address": "aws_instance.unknown",
+                    "type": "aws_instance",
+                    "name": "unknown",
+                    "provider_name": "registry.terraform.io/hashicorp/aws",
+                    "change": {"actions": [], "before": None, "after": None},
+                }
+            ],
+        }
+        plan = parse_terraform_plan(data)
+        assert len(plan.changes) == 0
+
+
+# ── Pulumi Parser Additional Tests ───────────────────────────────────────
+
+class TestPulumiParserExtended:
+    def test_parse_from_json_string(self, sample_pulumi_preview):
+        json_str = json.dumps(sample_pulumi_preview)
+        plan = parse_pulumi_preview(json_str)
+        assert len(plan.changes) == 3
+
+    def test_parse_replace_step(self):
+        data = {
+            "steps": [
+                {
+                    "urn": "urn:pulumi:prod::myapp::aws:ec2/instance:Instance::web",
+                    "op": "replace",
+                    "old": {"instance_type": "t3.micro"},
+                    "new": {"instance_type": "t3.large"},
+                }
+            ]
+        }
+        plan = parse_pulumi_preview(data)
+        assert len(plan.changes) == 1
+        assert plan.changes[0].action == ChangeAction.REPLACE
+
+    def test_parse_same_step(self):
+        data = {
+            "steps": [
+                {
+                    "urn": "urn:pulumi:prod::myapp::aws:s3/bucket:Bucket::my-bucket",
+                    "op": "same",
+                    "old": {"bucket": "unchanged"},
+                    "new": {"bucket": "unchanged"},
+                }
+            ]
+        }
+        plan = parse_pulumi_preview(data)
+        assert len(plan.changes) == 1
+        assert plan.changes[0].action == ChangeAction.NO_OP
+
+    def test_parse_empty_steps(self):
+        data = {"steps": [], "resourceChanges": {}}
+        plan = parse_pulumi_preview(data)
+        assert len(plan.changes) == 0
+
+    def test_provider_detection_azure(self):
+        data = {
+            "steps": [
+                {
+                    "urn": "urn:pulumi:prod::myapp::azure-native:compute/virtualMachine:VirtualMachine::vm",
+                    "op": "create",
+                    "new": {"name": "my-vm"},
+                }
+            ]
+        }
+        plan = parse_pulumi_preview(data)
+        assert plan.changes[0].provider == "azure"
+
+    def test_provider_detection_gcp(self):
+        data = {
+            "steps": [
+                {
+                    "urn": "urn:pulumi:prod::myapp::gcp:compute/instance:Instance::instance",
+                    "op": "create",
+                    "new": {"name": "my-instance"},
+                }
+            ]
+        }
+        plan = parse_pulumi_preview(data)
+        assert plan.changes[0].provider == "gcp"
+
+    def test_short_urn_fallback(self):
+        data = {
+            "steps": [
+                {
+                    "urn": "short:urn",
+                    "op": "create",
+                    "new": {"name": "test"},
+                }
+            ]
+        }
+        plan = parse_pulumi_preview(data)
+        assert len(plan.changes) == 1
+        # short URNs fall back to "unknown" type with full URN as name
+        assert plan.changes[0].resource_type == "unknown"
+
+    def test_missing_urn_in_step(self):
+        data = {
+            "steps": [
+                {
+                    "step": "create",
+                    "new": {"urn": "urn:pulumi:prod::myapp::aws:s3/bucket:Bucket::b", "bucket": "b"},
+                }
+            ]
+        }
+        plan = parse_pulumi_preview(data)
+        assert len(plan.changes) == 1
