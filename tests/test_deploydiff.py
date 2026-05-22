@@ -954,8 +954,8 @@ class TestTerraformParserExtended:
         }
         plan = parse_terraform_plan(data)
         assert len(plan.changes) == 1
-        # Both (delete, create) and (create, delete) resolve to CREATE_BEFORE_DELETE
-        assert plan.changes[0].action == ChangeAction.CREATE_BEFORE_DELETE
+        # (delete, create) means delete first then create = DELETE_BEFORE_CREATE
+        assert plan.changes[0].action == ChangeAction.DELETE_BEFORE_CREATE
 
     def test_parse_empty_actions(self):
         data = {
