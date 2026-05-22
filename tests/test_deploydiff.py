@@ -265,6 +265,53 @@ class TestTerraformParser:
         plan = parse_terraform_plan({"format_version": "1.2", "resource_changes": []})
         assert len(plan.changes) == 0
 
+    def test_parse_empty_actions(self):
+        """Resource change with empty actions list is skipped (hits continue path)."""
+        data = {
+            "format_version": "1.2",
+            "resource_changes": [
+                {
+                    "address": "aws_instance.noop",
+                    "type": "aws_instance",
+                    "name": "noop",
+                    "provider_name": "registry.terraform.io/hashicorp/aws",
+                    "change": {"actions": [], "before": None, "after": None},
+                },
+                {
+                    "address": "aws_instance.valid",
+                    "type": "aws_instance",
+                    "name": "valid",
+                    "provider_name": "registry.terraform.io/hashicorp/aws",
+                    "change": {"actions": ["create"], "before": None, "after": {}},
+                },
+            ],
+        }
+        plan = parse_terraform_plan(data)
+        assert len(plan.changes) == 1
+        assert plan.changes[0].address == "aws_instance.valid"
+
+    def test_parse_delete_before_create(self):
+        """Resource change with [delete, create] resolves to DELETE_BEFORE_CREATE."""
+        data = {
+            "format_version": "1.2",
+            "resource_changes": [
+                {
+                    "address": "aws_instance.replaced",
+                    "type": "aws_instance",
+                    "name": "replaced",
+                    "provider_name": "registry.terraform.io/hashicorp/aws",
+                    "change": {
+                        "actions": ["delete", "create"],
+                        "before": {"instance_type": "t3.micro"},
+                        "after": {"instance_type": "t3.large"},
+                    },
+                }
+            ],
+        }
+        plan = parse_terraform_plan(data)
+        assert len(plan.changes) == 1
+        assert plan.changes[0].action == ChangeAction.DELETE_BEFORE_CREATE
+
 
 # ── CloudFormation Parser Tests ───────────────────────────────────────────
 
