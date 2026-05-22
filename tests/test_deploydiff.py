@@ -957,6 +957,28 @@ class TestTerraformParserExtended:
         # (delete, create) means delete first then create = DELETE_BEFORE_CREATE
         assert plan.changes[0].action == ChangeAction.DELETE_BEFORE_CREATE
 
+    def test_parse_create_before_delete(self):
+        data = {
+            "format_version": "1.2",
+            "resource_changes": [
+                {
+                    "address": "aws_instance.replaced",
+                    "type": "aws_instance",
+                    "name": "replaced",
+                    "provider_name": "registry.terraform.io/hashicorp/aws",
+                    "change": {
+                        "actions": ["create", "delete"],
+                        "before": None,
+                        "after": {"instance_type": "t3.large"},
+                    },
+                }
+            ],
+        }
+        plan = parse_terraform_plan(data)
+        assert len(plan.changes) == 1
+        # (create, delete) means create first then delete = CREATE_BEFORE_DELETE
+        assert plan.changes[0].action == ChangeAction.CREATE_BEFORE_DELETE
+
     def test_parse_empty_actions(self):
         data = {
             "format_version": "1.2",
