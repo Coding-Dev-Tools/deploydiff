@@ -109,12 +109,12 @@ def _resolve_primary_action(actions: list[str]) -> ChangeAction | None:
     if not actions:
         return None
 
-    # Multi-action cases
+    # Multi-action cases — preserve original order to distinguish
+    # [create, delete] = create before delete, [delete, create] = delete before create
     if len(actions) == 2:
-        pair = tuple(sorted(actions))
-        if pair == ("create", "delete"):
+        if actions == ["create", "delete"]:
             return ChangeAction.CREATE_BEFORE_DELETE
-        if pair == ("delete", "create"):
+        if actions == ["delete", "create"]:
             return ChangeAction.DELETE_BEFORE_CREATE
 
     # Single action
