@@ -342,6 +342,35 @@ class TestPulumiParser:
         aws_changes = [c for c in plan.changes if c.provider == "aws"]
         assert len(aws_changes) == 3
 
+    def test_parse_pulumi_urn_malformed_short(self):
+        """Two-part URN returns (first, last) parts."""
+        from deploydiff.pulumi_parser import _parse_pulumi_urn
+        resource_type, name = _parse_pulumi_urn("urn:pulumi::something")
+        assert resource_type == "urn:pulumi"
+        assert name == "something"
+
+    def test_parse_pulumi_urn_single_segment(self):
+        """Single-segment URN returns (unknown, full_urn)."""
+        from deploydiff.pulumi_parser import _parse_pulumi_urn
+        resource_type, name = _parse_pulumi_urn("just-a-name")
+        assert resource_type == "unknown"
+        assert name == "just-a-name"
+
+    def test_extract_provider_azure(self):
+        """Azure provider detection from resource type."""
+        from deploydiff.pulumi_parser import _extract_provider_from_type
+        assert _extract_provider_from_type("azure-native:resources:ResourceGroup") == "azure"
+
+    def test_extract_provider_gcp(self):
+        """GCP provider detection from resource type."""
+        from deploydiff.pulumi_parser import _extract_provider_from_type
+        assert _extract_provider_from_type("google-native:compute:Instance") == "gcp"
+
+    def test_extract_provider_unknown(self):
+        """Unknown provider returns 'unknown'."""
+        from deploydiff.pulumi_parser import _extract_provider_from_type
+        assert _extract_provider_from_type("kubernetes:core:Pod") == "unknown"
+
 
 # ── Cost Estimator Tests ─────────────────────────────────────────────────
 
@@ -993,3 +1022,11 @@ class TestPulumiParserExtended:
         }
         plan = parse_pulumi_preview(data)
         assert len(plan.changes) == 1
+    def test_mcp_without_click_to_mcp(self):
+        """MCP command exits 1 when click-to-mcp is not installed."""
+        runner = CliRunner()
+        result = runner.invoke(main, ["mcp"])
+        # Either exits 1 (ImportError caught) or 0 (if click-to-mcp is installed)
+        assert result.exit_code in (0, 1)
+        if result.exit_code == 1:
+            assert "click-to-mcp" in result.output.lower()
