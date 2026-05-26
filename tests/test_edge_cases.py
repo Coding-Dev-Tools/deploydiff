@@ -6,17 +6,17 @@ Covers uncovered paths in CLI, cost estimator, rollback, and packaging config.
 from __future__ import annotations
 
 import json
-import tomllib
-
-from click.testing import CliRunner
 from io import StringIO
 from pathlib import Path
+
+import tomllib
+from click.testing import CliRunner
 from rich.console import Console
 
 from deploydiff.cli import _load_plan, _render_costs, main
 from deploydiff.cost_estimator import DEFAULT_PRICING, _load_pricing
 from deploydiff.models import ChangeAction, ChangeSource, CostEstimate, DeployPlan, ResourceChange
-from deploydiff.rollback import generate_rollback_commands, _pulumi_rollback
+from deploydiff.rollback import _pulumi_rollback, generate_rollback_commands
 
 
 class TestCLIEdgeCases:
