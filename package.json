@@ -1,6 +1,6 @@
 {
   "name": "deploydiff",
-  "version": "0.1.1",
+  "version": "0.1.0",
   "description": "Compare deployment configurations across environments. Detect drift between staging and production configs.",
   "author": "Revenue Holdings <engineering@revenueholdings.dev>",
   "license": "MIT",
