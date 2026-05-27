@@ -15,7 +15,7 @@ from .rollback import generate_rollback_commands
 from .terraform_parser import parse_terraform_plan
 
 try:
-    from revenueholdings_license.integration import rh_check
+    from revenueholdings_license import require_license
     _HAS_RH_LICENSE = True
 except ImportError:
     _HAS_RH_LICENSE = False
@@ -32,7 +32,7 @@ def main(ctx, no_gate) -> None:
     ctx.ensure_object(dict)
     ctx.obj["no_gate"] = no_gate
     if _HAS_RH_LICENSE and not no_gate:
-        rh_check("deploydiff")
+        require_license("deploydiff")
 
 
 @main.command()
@@ -76,8 +76,8 @@ def preview(terraform_file, cloudformation_file, pulumi_file, verbose, exit_on_d
 def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file, threshold) -> None:
     """Estimate monthly cost impact of infrastructure changes. (Pro feature)"""
     if _HAS_RH_LICENSE:
-        from revenueholdings_license.license import Tier, require_tier
-        require_tier(Tier.PRO, "deploydiff cost")
+        from revenueholdings_license import require_tier
+        require_tier("pro", "deploydiff cost")
     plan = _load_plan(terraform_file, cloudformation_file, pulumi_file)
     if plan is None:
         console.print("[red]Error: Provide one of --tf, --cfn, or --pulumi[/red]")
@@ -102,8 +102,8 @@ def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file, thresho
 def rollback(terraform_file, cloudformation_file, pulumi_file) -> None:
     """Generate rollback commands for infrastructure changes. (Pro feature)"""
     if _HAS_RH_LICENSE:
-        from revenueholdings_license.license import Tier, require_tier
-        require_tier(Tier.PRO, "deploydiff rollback")
+        from revenueholdings_license import require_tier
+        require_tier("pro", "deploydiff rollback")
     plan = _load_plan(terraform_file, cloudformation_file, pulumi_file)
     if plan is None:
         console.print("[red]Error: Provide one of --tf, --cfn, or --pulumi[/red]")
@@ -182,6 +182,6 @@ def mcp() -> None:
     """Start an MCP server exposing all CLI commands as AI-callable tools.
 
     Uses stdio transport compatible with Claude Code, Cursor, Codex, and
-    any MCP-compatible agent.  Run this from your MCP client configuration.
+    any MCP-compatible agent. Run this from your MCP client configuration.
     """
     run_for_app(main)
