@@ -8,25 +8,31 @@ from rich.console import Console
 from .cloudformation_parser import parse_cloudformation_changeset
 from .cost_estimator import estimate_costs
 from .diff_renderer import render_plan
+from .mcp_server import run_for_app
 from .models import CostEstimate, DeployPlan
 from .pulumi_parser import parse_pulumi_preview
 from .rollback import generate_rollback_commands
 from .terraform_parser import parse_terraform_plan
+
+try:
+    from revenueholdings_license.integration import rh_check, ci_gate
+    _HAS_RH_LICENSE = True
+except ImportError:
+    _HAS_RH_LICENSE = False
 
 console = Console()
 
 
 @click.group()
 @click.version_option(package_name="deploydiff")
-def main():
+@click.option("--no-gate", is_flag=True, help="Skip license gating check.")
+@click.pass_context
+def main(ctx, no_gate):
     """DeployDiff - Preview infrastructure changes with cost impact and rollback."""
-    try:
-        from revenueholdings_license import require_license
-        require_license("deploydiff")
-    except ImportError:
-        import warnings
-        warnings.warn("revenueholdings-license not installed; license checks skipped", stacklevel=2)
-    pass
+    ctx.ensure_object(dict)
+    ctx.obj["no_gate"] = no_gate
+    if _HAS_RH_LICENSE and not no_gate:
+        rh_check("deploydiff")
 
 
 @main.command()
@@ -68,7 +74,10 @@ def preview(terraform_file, cloudformation_file, pulumi_file, verbose, exit_on_d
     help="Exit with code 1 if total monthly cost delta exceeds this value (e.g. 500 for $500)",
 )
 def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file, threshold):
-    """Estimate monthly cost impact of infrastructure changes."""
+    """Estimate monthly cost impact of infrastructure changes. (Pro feature)"""
+    if _HAS_RH_LICENSE:
+        from revenueholdings_license.license import require_tier, Tier
+        require_tier(Tier.PRO, "deploydiff cost")
     plan = _load_plan(terraform_file, cloudformation_file, pulumi_file)
     if plan is None:
         console.print("[red]Error: Provide one of --tf, --cfn, or --pulumi[/red]")
@@ -91,7 +100,10 @@ def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file, thresho
 @click.option("--cfn", "cloudformation_file", type=click.Path(exists=True), help="CloudFormation change set JSON file")
 @click.option("--pulumi", "pulumi_file", type=click.Path(exists=True), help="Pulumi preview JSON file")
 def rollback(terraform_file, cloudformation_file, pulumi_file):
-    """Generate rollback commands for infrastructure changes."""
+    """Generate rollback commands for infrastructure changes. (Pro feature)"""
+    if _HAS_RH_LICENSE:
+        from revenueholdings_license.license import require_tier, Tier
+        require_tier(Tier.PRO, "deploydiff rollback")
     plan = _load_plan(terraform_file, cloudformation_file, pulumi_file)
     if plan is None:
         console.print("[red]Error: Provide one of --tf, --cfn, or --pulumi[/red]")
@@ -100,21 +112,6 @@ def rollback(terraform_file, cloudformation_file, pulumi_file):
     commands = generate_rollback_commands(plan)
     for cmd in commands:
         console.print(cmd)
-
-
-@main.command()
-def mcp():
-    """Run as an MCP (Model Context Protocol) server over stdio.
-
-    AI coding agents (Claude Code, Cursor, etc.) use this to interact
-    with deploydiff tools directly.
-    """
-    try:
-        from click_to_mcp import serve_stdio
-    except ImportError:
-        print("Error: click-to-mcp is required for MCP support. Install with: pip install click-to-mcp")
-        raise SystemExit(1) from None
-    serve_stdio(main, name="deploydiff")
 
 
 def _load_plan(
@@ -144,8 +141,8 @@ def _load_plan(
 
 def _render_costs(estimates: list[CostEstimate], plan: DeployPlan, console: Console) -> None:
     """Render cost estimates to the console."""
-    from rich import box
     from rich.table import Table
+    from rich import box
 
     table = Table(title="Cost Impact Estimate", box=box.ROUNDED, show_header=True)
     table.add_column("Resource", style="bold")
@@ -177,8 +174,14 @@ def _render_costs(estimates: list[CostEstimate], plan: DeployPlan, console: Cons
     elif total < 0:
         console.print(f"\n[bold green]Total monthly decrease: -${abs(total):.2f}[/bold green]")
     else:
-        console.print("\n[bold]Total monthly change: $0.00[/bold]")
+        console.print(f"\n[bold]Total monthly change: $0.00[/bold]")
 
 
-if __name__ == "__main__":
-    main()
+@main.command()
+def mcp() -> None:
+    """Start an MCP server exposing all CLI commands as AI-callable tools.
+
+    Uses stdio transport compatible with Claude Code, Cursor, Codex, and
+    any MCP-compatible agent.  Run this from your MCP client configuration.
+    """
+    run_for_app(main)
