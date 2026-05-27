@@ -139,7 +139,7 @@ def _render_change_details(change: ResourceChange, console: Console) -> None:
 
     console.print(f"  [dim]── {change.address} ──[/dim]")
 
-    all_keys = set()
+    all_keys: set[str] = set()
     if change.before:
         all_keys.update(change.before.keys())
     if change.after:
