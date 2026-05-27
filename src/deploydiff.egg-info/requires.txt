@@ -1,9 +1,0 @@
-click>=8.1
-rich>=13.0
-
-[dev]
-pytest>=7.0
-pytest-cov>=4.0
-
-[licensing]
-revenueholdings-license>=0.1.0

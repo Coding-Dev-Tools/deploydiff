@@ -24,6 +24,11 @@ Real-world scenarios:
 ## Installation
 
 ```bash
+pip install deploydiff
+```
+
+Or install the latest version directly from GitHub:
+```bash
 pip install git+https://github.com/Coding-Dev-Tools/deploydiff.git
 ```
 
