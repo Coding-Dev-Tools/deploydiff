@@ -15,7 +15,7 @@ from .rollback import generate_rollback_commands
 from .terraform_parser import parse_terraform_plan
 
 try:
-    from revenueholdings_license.integration import rh_check, ci_gate
+    from revenueholdings_license.integration import rh_check
     _HAS_RH_LICENSE = True
 except ImportError:
     _HAS_RH_LICENSE = False
@@ -76,7 +76,7 @@ def preview(terraform_file, cloudformation_file, pulumi_file, verbose, exit_on_d
 def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file, threshold):
     """Estimate monthly cost impact of infrastructure changes. (Pro feature)"""
     if _HAS_RH_LICENSE:
-        from revenueholdings_license.license import require_tier, Tier
+        from revenueholdings_license.license import Tier, require_tier
         require_tier(Tier.PRO, "deploydiff cost")
     plan = _load_plan(terraform_file, cloudformation_file, pulumi_file)
     if plan is None:
@@ -102,7 +102,7 @@ def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file, thresho
 def rollback(terraform_file, cloudformation_file, pulumi_file):
     """Generate rollback commands for infrastructure changes. (Pro feature)"""
     if _HAS_RH_LICENSE:
-        from revenueholdings_license.license import require_tier, Tier
+        from revenueholdings_license.license import Tier, require_tier
         require_tier(Tier.PRO, "deploydiff rollback")
     plan = _load_plan(terraform_file, cloudformation_file, pulumi_file)
     if plan is None:
@@ -141,8 +141,8 @@ def _load_plan(
 
 def _render_costs(estimates: list[CostEstimate], plan: DeployPlan, console: Console) -> None:
     """Render cost estimates to the console."""
-    from rich.table import Table
     from rich import box
+    from rich.table import Table
 
     table = Table(title="Cost Impact Estimate", box=box.ROUNDED, show_header=True)
     table.add_column("Resource", style="bold")
@@ -174,7 +174,7 @@ def _render_costs(estimates: list[CostEstimate], plan: DeployPlan, console: Cons
     elif total < 0:
         console.print(f"\n[bold green]Total monthly decrease: -${abs(total):.2f}[/bold green]")
     else:
-        console.print(f"\n[bold]Total monthly change: $0.00[/bold]")
+        console.print("\n[bold]Total monthly change: $0.00[/bold]")
 
 
 @main.command()
