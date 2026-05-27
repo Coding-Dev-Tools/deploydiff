@@ -27,7 +27,7 @@ console = Console()
 @click.version_option(package_name="deploydiff")
 @click.option("--no-gate", is_flag=True, help="Skip license gating check.")
 @click.pass_context
-def main(ctx, no_gate):
+def main(ctx, no_gate) -> None:
     """DeployDiff - Preview infrastructure changes with cost impact and rollback."""
     ctx.ensure_object(dict)
     ctx.obj["no_gate"] = no_gate
@@ -45,7 +45,7 @@ def main(ctx, no_gate):
     is_flag=True,
     help="Exit with code 1 if the plan contains destructive changes (deletes or replaces)",
 )
-def preview(terraform_file, cloudformation_file, pulumi_file, verbose, exit_on_destroy):
+def preview(terraform_file, cloudformation_file, pulumi_file, verbose, exit_on_destroy) -> None:
     """Preview infrastructure changes from a plan file."""
     plan = _load_plan(terraform_file, cloudformation_file, pulumi_file)
     if plan is None:
@@ -73,7 +73,7 @@ def preview(terraform_file, cloudformation_file, pulumi_file, verbose, exit_on_d
     default=None,
     help="Exit with code 1 if total monthly cost delta exceeds this value (e.g. 500 for $500)",
 )
-def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file, threshold):
+def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file, threshold) -> None:
     """Estimate monthly cost impact of infrastructure changes. (Pro feature)"""
     if _HAS_RH_LICENSE:
         from revenueholdings_license.license import Tier, require_tier
@@ -99,7 +99,7 @@ def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file, thresho
 @click.option("--tf", "terraform_file", type=click.Path(exists=True), help="Terraform plan JSON file")
 @click.option("--cfn", "cloudformation_file", type=click.Path(exists=True), help="CloudFormation change set JSON file")
 @click.option("--pulumi", "pulumi_file", type=click.Path(exists=True), help="Pulumi preview JSON file")
-def rollback(terraform_file, cloudformation_file, pulumi_file):
+def rollback(terraform_file, cloudformation_file, pulumi_file) -> None:
     """Generate rollback commands for infrastructure changes. (Pro feature)"""
     if _HAS_RH_LICENSE:
         from revenueholdings_license.license import Tier, require_tier
