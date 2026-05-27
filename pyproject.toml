@@ -46,6 +46,9 @@ Documentation = "https://github.com/Coding-Dev-Tools/deploydiff#readme"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+
+[tool.setuptools.package-data]
+"*" = ["py.typed"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
