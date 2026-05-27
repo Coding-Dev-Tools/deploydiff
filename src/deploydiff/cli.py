@@ -178,3 +178,7 @@ def _render_costs(estimates: list[CostEstimate], plan: DeployPlan, console: Cons
         console.print(f"\n[bold green]Total monthly decrease: -${abs(total):.2f}[/bold green]")
     else:
         console.print("\n[bold]Total monthly change: $0.00[/bold]")
+
+
+if __name__ == "__main__":
+    main()
