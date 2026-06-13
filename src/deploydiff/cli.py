@@ -8,7 +8,6 @@ from rich.console import Console
 from .cloudformation_parser import parse_cloudformation_changeset
 from .cost_estimator import estimate_costs
 from .diff_renderer import render_plan
-from .mcp_server import run_for_app
 from .models import CostEstimate, DeployPlan
 from .pulumi_parser import parse_pulumi_preview
 from .rollback import generate_rollback_commands
@@ -184,4 +183,13 @@ def mcp() -> None:
     Uses stdio transport compatible with Claude Code, Cursor, Codex, and
     any MCP-compatible agent. Run this from your MCP client configuration.
     """
+    try:
+        from .mcp_server import run_for_app
+    except ImportError as exc:
+        console.print(
+            "[red]Error: click-to-mcp is not installed.[/red]\n"
+            "Install it with: [bold]pip install click-to-mcp[/bold]"
+        )
+        raise SystemExit(1) from exc
+
     run_for_app(main)
