@@ -114,20 +114,6 @@ def rollback(terraform_file, cloudformation_file, pulumi_file) -> None:
         console.print(cmd)
 
 
-@main.command()
-def mcp():
-    """Run as an MCP (Model Context Protocol) server over stdio.
-
-    AI coding agents (Claude Code, Cursor, etc.) use this to interact
-    with deploydiff tools directly.
-    """
-    try:
-        from click_to_mcp import serve_stdio
-    except ImportError:
-        click.echo("Error: click-to-mcp is required for MCP support. Install with: pip install click-to-mcp", err=True)
-        raise SystemExit(1) from None
-    serve_stdio(main, name="deploydiff")
-
 
 def _load_plan(
     terraform_file: str | None,
