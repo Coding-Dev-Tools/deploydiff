@@ -71,3 +71,15 @@ Thumbs.db
 research/
 fixtures/generated/
 .ruff_cache/
+
+# Merge artifacts and cache (added by workspace stabilization)
+*.pyc
+*.pyo
+*.pyd
+*.orig
+*.BACKUP.*
+*.BASE.*
+*.LOCAL.*
+*.REMOTE.*
+local.db
+*.sqlite3
