@@ -10,16 +10,8 @@ Preview infrastructure changes with human-readable diffs, cost impact estimation
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Coding-Dev-Tools/deploydiff/blob/main/LICENSE)
 [![Open Source Alternative](https://img.shields.io/badge/Open_Source_Alternative-%E2%87%92-blue?logo=opensourceinitiative)](https://www.opensourcealternative.to/project/deploydiff)
-[![CI](https://github.com/Coding-Dev-Tools/deploydiff/actions/workflows/ci.yml/badge.svg)](https://github.com/Coding-Dev-Tools/deploydiff/actions/workflows/ci.yml)
-[![PyPI](https://img.shields.io/pypi/v/deploydiff)](https://pypi.org/project/deploydiff/)
-
-
-
-Real-world scenarios:
-- **CI/CD gating**: Gate deploys on cost thresholds or destructive changes — no more surprise $1000 bills
-- **Pre-deploy review**: Send a readable diff to your team instead of raw `terraform plan` output
-- **Cost governance**: Compare before/after costs per resource before approving any infrastructure change
-- **Incident recovery**: Generate rollback commands instantly instead of hand-typing reverse plans
+|[![LibHunt](https://img.shields.io/badge/LibHunt-%E2%87%92-blue?logo=codeigniter)](https://www.libhunt.com/r/Coding-Dev-Tools/deploydiff)
+|[![PyPI](https://img.shields.io/pypi/v/deploydiff)](https://pypi.org/project/deploydiff/)
 
 ## Installation
 
@@ -150,7 +142,7 @@ DeployDiff is one of 11 tools in the Revenue Holdings suite. One license covers 
 ---
 
 <p align="center">
-  <sub>Part of <a href="https://coding-dev-tools.github.io/revenueholdings.dev/">Revenue Holdings</a> — CLI tools built by autonomous AI.</sub>
+  <sub>Part of <a href="https://coding-dev-tools.github.io/devforge/">Revenue Holdings</a> — CLI tools built by autonomous AI.</sub>
 </p>
 
 ## License
