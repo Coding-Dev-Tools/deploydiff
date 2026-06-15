@@ -1,8 +1,10 @@
 """Tests for DeployDiff CLI - models, parsers, cost estimator, rollback, and CLI."""
 
 import json
+
 import pytest
 from click.testing import CliRunner
+
 from deploydiff.cli import main
 from deploydiff.cloudformation_parser import parse_cloudformation_changeset
 from deploydiff.cost_estimator import estimate_costs
@@ -497,6 +499,7 @@ class TestRenderer:
     def test_render_basic_plan(self, sample_terraform_plan):
         """Render should not raise errors."""
         from io import StringIO
+
         from rich.console import Console
         plan = parse_terraform_plan(sample_terraform_plan)
         buf = StringIO()
@@ -509,6 +512,7 @@ class TestRenderer:
     def test_render_empty_plan(self):
         """Render an empty plan shows no changes."""
         from io import StringIO
+
         from rich.console import Console
         plan = DeployPlan(source=ChangeSource.TERRAFORM, changes=[])
         buf = StringIO()
@@ -521,6 +525,7 @@ class TestRenderer:
     def test_render_verbose_terraform(self, sample_terraform_plan):
         """Verbose mode shows before/after details for each change."""
         from io import StringIO
+
         from rich.console import Console
         plan = parse_terraform_plan(sample_terraform_plan)
         buf = StringIO()
@@ -533,6 +538,7 @@ class TestRenderer:
     def test_render_verbose_with_sensitive(self):
         """Verbose mode masks sensitive values."""
         from io import StringIO
+
         from rich.console import Console
         change = ResourceChange(
             address="aws_db_instance.db",
@@ -558,6 +564,7 @@ class TestRenderer:
     def test_render_destructive_change_warning(self, sample_terraform_plan):
         """Destructive changes trigger a warning message."""
         from io import StringIO
+
         from rich.console import Console
         plan = parse_terraform_plan(sample_terraform_plan)
         buf = StringIO()
@@ -570,6 +577,7 @@ class TestRenderer:
     def test_render_plan_without_destructive_changes(self):
         """Plan with only creates/updates should not show destructive warning."""
         from io import StringIO
+
         from rich.console import Console
         changes = [
             ResourceChange(
@@ -597,6 +605,7 @@ class TestRenderer:
     def test_render_cfn_plan(self, sample_cfn_changeset):
         """Render a CloudFormation plan."""
         from io import StringIO
+
         from rich.console import Console
         plan = parse_cloudformation_changeset(sample_cfn_changeset)
         buf = StringIO()
@@ -609,6 +618,7 @@ class TestRenderer:
     def test_render_pulumi_plan(self, sample_pulumi_preview):
         """Render a Pulumi plan."""
         from io import StringIO
+
         from rich.console import Console
         plan = parse_pulumi_preview(sample_pulumi_preview)
         buf = StringIO()
@@ -620,6 +630,7 @@ class TestRenderer:
     def test_render_replacement(self):
         """Render a plan with a replacement change."""
         from io import StringIO
+
         from rich.console import Console
         change = ResourceChange(
             address="module.vpc.aws_nat_gateway.main",
@@ -640,9 +651,11 @@ class TestRenderer:
 
     def test_render_change_details_missing_data(self):
         """Render change details with no before/after should not error."""
-        from deploydiff.diff_renderer import _render_change_details
         from io import StringIO
+
         from rich.console import Console
+
+        from deploydiff.diff_renderer import _render_change_details
         change = ResourceChange(
             address="aws_instance.web",
             action=ChangeAction.CREATE,
