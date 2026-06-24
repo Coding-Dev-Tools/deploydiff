@@ -15,6 +15,8 @@ dependencies = [
     "click>=8.1",
     "rich>=13.0",
     "pyyaml>=6.0",
+    "tomli>=2.0",
+    "jinja2>=3.1",
 ]
 keywords = ["infrastructure", "terraform", "cloudformation", "pulumi", "cost", "diff", "cli"]
 classifiers = [
