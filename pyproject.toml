@@ -31,15 +31,15 @@ classifiers = [
 # Optional paywall gating (Model-B license). The tool runs without it
 # (require_license no-ops on ImportError); install to enable Free/Pro
 # tiers:  pip install deploydiff[license]
-license = [
-    "revenueholdings_license @ git+https://github.com/Coding-Dev-Tools/revenueholdings_license.git",
-]
+# license = [
+#     "revenueholdings_license @ git+https://github.com/Coding-Dev-Tools/revenueholdings_license.git",
+# ]
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
     "ruff>=0.4.0",
 ]
-license = ["revenueholdings-license>=0.1.0"]
+# Duplicate license entries removed.
 
 [project.scripts]
 deploydiff = "deploydiff.cli:main"
