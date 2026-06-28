@@ -35,24 +35,16 @@ def _terraform_rollback(plan: DeployPlan) -> list[str]:
 
     # For each create, we need to destroy it
     for change in plan.creates:
-        commands.append(
-            f"terraform destroy -target={change.address} -auto-approve"
-        )
+        commands.append(f"terraform destroy -target={change.address} -auto-approve")
 
     # For each destructive change (delete/replace), we need to re-apply it
     for change in plan.destructive_changes:
-        commands.append(
-            f"terraform apply -target={change.address} -auto-approve"
-        )
+        commands.append(f"terraform apply -target={change.address} -auto-approve")
 
     # For updates, we can try to revert with the previous state
     for change in plan.updates:
-        commands.append(
-            f"# To revert {change.address}, restore previous config and run:"
-        )
-        commands.append(
-            f"terraform apply -target={change.address} -auto-approve"
-        )
+        commands.append(f"# To revert {change.address}, restore previous config and run:")
+        commands.append(f"terraform apply -target={change.address} -auto-approve")
 
     if not plan.changes:
         commands.append("# No changes to roll back")
@@ -81,14 +73,10 @@ def _cloudformation_rollback(plan: DeployPlan) -> list[str]:
         stack_name = "STACK_NAME"
 
     for change in plan.creates:
-        commands.append(
-            f"# Rollback create: remove {change.address}"
-        )
+        commands.append(f"# Rollback create: remove {change.address}")
 
     for change in plan.destructive_changes:
-        commands.append(
-            f"# Rollback delete/replace: re-create {change.address}"
-        )
+        commands.append(f"# Rollback delete/replace: re-create {change.address}")
 
     commands.append("")
     commands.append("# Full stack rollback options:")

@@ -16,6 +16,7 @@ from deploydiff.terraform_parser import parse_terraform_plan
 
 # ── Fixtures ──────────────────────────────────────────────────────────────
 
+
 @pytest.fixture
 def sample_terraform_plan():
     return {
@@ -162,6 +163,7 @@ def sample_pulumi_preview():
 
 # ── Model Tests ──────────────────────────────────────────────────────────
 
+
 class TestResourceChange:
     def test_is_destructive_delete(self):
         rc = ResourceChange("a.b", ChangeAction.DELETE, "aws_instance", "b", ChangeSource.TERRAFORM)
@@ -215,6 +217,7 @@ class TestDeployPlan:
 
 # ── Terraform Parser Tests ───────────────────────────────────────────────
 
+
 class TestTerraformParser:
     def test_parse_basic_plan(self, sample_terraform_plan):
         plan = parse_terraform_plan(sample_terraform_plan)
@@ -243,9 +246,10 @@ class TestTerraformParser:
     def test_parse_multi_action(self, sample_terraform_plan):
         plan = parse_terraform_plan(sample_terraform_plan)
         multi_changes = [
-        c for c in plan.changes
-        if c.action in (ChangeAction.CREATE_BEFORE_DELETE, ChangeAction.DELETE_BEFORE_CREATE)
-    ]
+            c
+            for c in plan.changes
+            if c.action in (ChangeAction.CREATE_BEFORE_DELETE, ChangeAction.DELETE_BEFORE_CREATE)
+        ]
         assert len(multi_changes) == 1
 
     def test_module_path(self, sample_terraform_plan):
@@ -317,6 +321,7 @@ class TestTerraformParser:
 
 # ── CloudFormation Parser Tests ───────────────────────────────────────────
 
+
 class TestCloudFormationParser:
     def test_parse_basic_changeset(self, sample_cfn_changeset):
         plan = parse_cloudformation_changeset(sample_cfn_changeset)
@@ -352,6 +357,7 @@ class TestCloudFormationParser:
 
 
 # ── Pulumi Parser Tests ──────────────────────────────────────────────────
+
 
 class TestPulumiParser:
     def test_parse_basic_preview(self, sample_pulumi_preview):
@@ -394,6 +400,7 @@ class TestPulumiParser:
     def test_parse_pulumi_urn_malformed_short(self):
         """Two-part URN returns (first, last) parts."""
         from deploydiff.pulumi_parser import _parse_pulumi_urn
+
         resource_type, name = _parse_pulumi_urn("urn:pulumi::something")
         assert resource_type == "urn:pulumi"
         assert name == "something"
@@ -401,6 +408,7 @@ class TestPulumiParser:
     def test_parse_pulumi_urn_single_segment(self):
         """Single-segment URN returns (unknown, full_urn)."""
         from deploydiff.pulumi_parser import _parse_pulumi_urn
+
         resource_type, name = _parse_pulumi_urn("just-a-name")
         assert resource_type == "unknown"
         assert name == "just-a-name"
@@ -408,20 +416,24 @@ class TestPulumiParser:
     def test_extract_provider_azure(self):
         """Azure provider detection from resource type."""
         from deploydiff.pulumi_parser import _extract_provider_from_type
+
         assert _extract_provider_from_type("azure-native:resources:ResourceGroup") == "azure"
 
     def test_extract_provider_gcp(self):
         """GCP provider detection from resource type."""
         from deploydiff.pulumi_parser import _extract_provider_from_type
+
         assert _extract_provider_from_type("google-native:compute:Instance") == "gcp"
 
     def test_extract_provider_unknown(self):
         """Unknown provider returns 'unknown'."""
         from deploydiff.pulumi_parser import _extract_provider_from_type
+
         assert _extract_provider_from_type("kubernetes:core:Pod") == "unknown"
 
 
 # ── Cost Estimator Tests ─────────────────────────────────────────────────
+
 
 class TestCostEstimator:
     def test_estimate_create_cost(self, sample_terraform_plan):
@@ -467,6 +479,7 @@ class TestCostEstimator:
 
 # ── Rollback Tests ────────────────────────────────────────────────────────
 
+
 class TestRollback:
     def test_terraform_rollback(self, sample_terraform_plan):
         plan = parse_terraform_plan(sample_terraform_plan)
@@ -495,12 +508,14 @@ class TestRollback:
 
 # ── Renderer Tests ────────────────────────────────────────────────────────
 
+
 class TestRenderer:
     def test_render_basic_plan(self, sample_terraform_plan):
         """Render should not raise errors."""
         from io import StringIO
 
         from rich.console import Console
+
         plan = parse_terraform_plan(sample_terraform_plan)
         buf = StringIO()
         console = Console(file=buf, force_terminal=True)
@@ -514,6 +529,7 @@ class TestRenderer:
         from io import StringIO
 
         from rich.console import Console
+
         plan = DeployPlan(source=ChangeSource.TERRAFORM, changes=[])
         buf = StringIO()
         console = Console(file=buf, force_terminal=True)
@@ -527,6 +543,7 @@ class TestRenderer:
         from io import StringIO
 
         from rich.console import Console
+
         plan = parse_terraform_plan(sample_terraform_plan)
         buf = StringIO()
         console = Console(file=buf, force_terminal=True)
@@ -540,6 +557,7 @@ class TestRenderer:
         from io import StringIO
 
         from rich.console import Console
+
         change = ResourceChange(
             address="aws_db_instance.db",
             action=ChangeAction.UPDATE,
@@ -566,6 +584,7 @@ class TestRenderer:
         from io import StringIO
 
         from rich.console import Console
+
         plan = parse_terraform_plan(sample_terraform_plan)
         buf = StringIO()
         console = Console(file=buf, force_terminal=True)
@@ -579,6 +598,7 @@ class TestRenderer:
         from io import StringIO
 
         from rich.console import Console
+
         changes = [
             ResourceChange(
                 address="aws_instance.web",
@@ -607,6 +627,7 @@ class TestRenderer:
         from io import StringIO
 
         from rich.console import Console
+
         plan = parse_cloudformation_changeset(sample_cfn_changeset)
         buf = StringIO()
         console = Console(file=buf, force_terminal=True)
@@ -620,6 +641,7 @@ class TestRenderer:
         from io import StringIO
 
         from rich.console import Console
+
         plan = parse_pulumi_preview(sample_pulumi_preview)
         buf = StringIO()
         console = Console(file=buf, force_terminal=True)
@@ -632,6 +654,7 @@ class TestRenderer:
         from io import StringIO
 
         from rich.console import Console
+
         change = ResourceChange(
             address="module.vpc.aws_nat_gateway.main",
             action=ChangeAction.REPLACE,
@@ -656,6 +679,7 @@ class TestRenderer:
         from rich.console import Console
 
         from deploydiff.diff_renderer import _render_change_details
+
         change = ResourceChange(
             address="aws_instance.web",
             action=ChangeAction.CREATE,
@@ -675,6 +699,7 @@ class TestRenderer:
     def test_group_by_action(self):
         """Grouping changes by action produces correct buckets."""
         from deploydiff.diff_renderer import _group_by_action
+
         changes = [
             ResourceChange("a", ChangeAction.CREATE, "t", "n", ChangeSource.TERRAFORM),
             ResourceChange("b", ChangeAction.CREATE, "t", "n", ChangeSource.TERRAFORM),
@@ -697,23 +722,27 @@ class TestRenderer:
     def test_render_create_before_delete_action_label(self):
         """Create-before-delete action has the right label."""
         from deploydiff.diff_renderer import ACTION_LABELS
+
         label = ACTION_LABELS[ChangeAction.CREATE_BEFORE_DELETE]
         assert "create-first" in label
 
     def test_render_no_op_label(self):
         """No-op action has the right label."""
         from deploydiff.diff_renderer import ACTION_LABELS
+
         label = ACTION_LABELS[ChangeAction.NO_OP]
         assert label == "no changes"
 
     def test_render_import_action_label(self):
         """Import action has the right label."""
         from deploydiff.diff_renderer import ACTION_LABELS
+
         label = ACTION_LABELS[ChangeAction.IMPORT]
         assert "imported" in label
 
 
 # ── CLI Integration Tests ─────────────────────────────────────────────────
+
 
 class TestCLI:
     def test_cli_help(self):
@@ -913,6 +942,7 @@ class TestCLI:
 
 # ── Terraform Parser Additional Tests ────────────────────────────────────
 
+
 class TestTerraformParserExtended:
     def test_parse_noop_action(self):
         data = {
@@ -1011,6 +1041,7 @@ class TestTerraformParserExtended:
 
 # ── Pulumi Parser Additional Tests ───────────────────────────────────────
 
+
 class TestPulumiParserExtended:
     def test_parse_from_json_string(self, sample_pulumi_preview):
         json_str = json.dumps(sample_pulumi_preview)
@@ -1104,6 +1135,7 @@ class TestPulumiParserExtended:
         }
         plan = parse_pulumi_preview(data)
         assert len(plan.changes) == 1
+
     def test_mcp_without_click_to_mcp(self):
         """MCP command exits 1 when click-to-mcp is not installed."""
         runner = CliRunner()

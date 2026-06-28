@@ -15,6 +15,7 @@ from .terraform_parser import parse_terraform_plan
 
 try:
     from revenueholdings_license import require_license
+
     _HAS_RH_LICENSE = True
 except ImportError:
     _HAS_RH_LICENSE = False
@@ -76,6 +77,7 @@ def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file, thresho
     """Estimate monthly cost impact of infrastructure changes. (Pro feature)"""
     if _HAS_RH_LICENSE:
         from revenueholdings_license import require_tier
+
         require_tier("pro", "deploydiff cost")
     plan = _load_plan(terraform_file, cloudformation_file, pulumi_file)
     if plan is None:
@@ -102,6 +104,7 @@ def rollback(terraform_file, cloudformation_file, pulumi_file) -> None:
     """Generate rollback commands for infrastructure changes. (Pro feature)"""
     if _HAS_RH_LICENSE:
         from revenueholdings_license import require_tier
+
         require_tier("pro", "deploydiff rollback")
     plan = _load_plan(terraform_file, cloudformation_file, pulumi_file)
     if plan is None:
@@ -111,7 +114,6 @@ def rollback(terraform_file, cloudformation_file, pulumi_file) -> None:
     commands = generate_rollback_commands(plan)
     for cmd in commands:
         console.print(cmd)
-
 
 
 def _load_plan(
@@ -188,8 +190,7 @@ def mcp() -> None:
         from .mcp_server import run_for_app
     except ImportError as exc:
         console.print(
-            "[red]Error: click-to-mcp is not installed.[/red]\n"
-            "Install it with: [bold]pip install click-to-mcp[/bold]"
+            "[red]Error: click-to-mcp is not installed.[/red]\nInstall it with: [bold]pip install click-to-mcp[/bold]"
         )
         raise SystemExit(1) from exc
 

@@ -72,9 +72,7 @@ def parse_terraform_plan(plan_json: str | dict[str, Any]) -> DeployPlan:
             else set()
         )
         after_sensitive = (
-            set(change.get("after_sensitive", {}).keys())
-            if isinstance(change.get("after_sensitive"), dict)
-            else set()
+            set(change.get("after_sensitive", {}).keys()) if isinstance(change.get("after_sensitive"), dict) else set()
         )
 
         resource_change = ResourceChange(

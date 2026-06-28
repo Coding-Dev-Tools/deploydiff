@@ -62,8 +62,8 @@ def parse_cloudformation_changeset(changeset_json: str | dict[str, Any]) -> Depl
 
         resource_type = resource_change_data.get("Type", resource_change_data.get("ResourceType", "unknown"))
         resource_name = resource_change_data.get(
-        "LogicalResourceId", resource_change_data.get("PhysicalResourceId", "unknown")
-    )
+            "LogicalResourceId", resource_change_data.get("PhysicalResourceId", "unknown")
+        )
         address = resource_change_data.get("LogicalResourceId", f"{resource_type}.{resource_name}")
 
         # Scope details for update changes

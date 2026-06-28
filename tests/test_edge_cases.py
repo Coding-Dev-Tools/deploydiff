@@ -152,10 +152,10 @@ class TestPackagingQuality:
         with open(pyproject, "rb") as f:
             data = tomllib.load(f)
         pkg_data = data.get("tool", {}).get("setuptools", {}).get("package-data", {})
-        assert "deploydiff" in pkg_data, \
-            "Expected [tool.setuptools.package-data] section for 'deploydiff'"
-        assert "py.typed" in pkg_data["deploydiff"], \
+        assert "deploydiff" in pkg_data, "Expected [tool.setuptools.package-data] section for 'deploydiff'"
+        assert "py.typed" in pkg_data["deploydiff"], (
             f"Expected 'py.typed' in package-data, got {pkg_data['deploydiff']}"
+        )
 
     def test_ruff_known_first_party(self):
         """ruff known-first-party should be ['deploydiff'], not ['*']."""
