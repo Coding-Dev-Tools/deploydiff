@@ -233,7 +233,7 @@ def _load_pricing(pricing_file: str | Path | None = None) -> dict[str, dict[str,
     if not path.exists():
         return DEFAULT_PRICING.copy()
 
-    with open(path) as f:
+    with path.open() as f:
         custom = json.load(f)
 
     # Merge with defaults (custom overrides)

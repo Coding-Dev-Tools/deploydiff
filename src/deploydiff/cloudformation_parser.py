@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 
 from .models import ChangeAction, ChangeSource, DeployPlan, ResourceChange
@@ -41,7 +42,7 @@ def parse_cloudformation_changeset(changeset_json: str | dict[str, Any]) -> Depl
         try:
             data = json.loads(changeset_json)
         except json.JSONDecodeError:
-            with open(changeset_json) as f:
+            with Path(changeset_json).open() as f:
                 data = json.load(f)
     else:
         data = changeset_json
