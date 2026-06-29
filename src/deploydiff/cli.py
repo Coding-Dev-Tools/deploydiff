@@ -15,6 +15,7 @@ from .terraform_parser import parse_terraform_plan
 
 try:
     from revenueholdings_license import require_license
+
     _HAS_RH_LICENSE = True
 except ImportError:
     _HAS_RH_LICENSE = False
@@ -35,16 +36,35 @@ def main(ctx, no_gate) -> None:
 
 
 @main.command()
-@click.option("--tf", "terraform_file", type=click.Path(exists=True), help="Terraform plan JSON file")
-@click.option("--cfn", "cloudformation_file", type=click.Path(exists=True), help="CloudFormation change set JSON file")
-@click.option("--pulumi", "pulumi_file", type=click.Path(exists=True), help="Pulumi preview JSON file")
-@click.option("-v", "--verbose", is_flag=True, help="Show before/after details for each change")
+@click.option(
+    "--tf",
+    "terraform_file",
+    type=click.Path(exists=True),
+    help="Terraform plan JSON file",
+)
+@click.option(
+    "--cfn",
+    "cloudformation_file",
+    type=click.Path(exists=True),
+    help="CloudFormation change set JSON file",
+)
+@click.option(
+    "--pulumi",
+    "pulumi_file",
+    type=click.Path(exists=True),
+    help="Pulumi preview JSON file",
+)
+@click.option(
+    "-v", "--verbose", is_flag=True, help="Show before/after details for each change"
+)
 @click.option(
     "--exit-on-destroy",
     is_flag=True,
     help="Exit with code 1 if the plan contains destructive changes (deletes or replaces)",
 )
-def preview(terraform_file, cloudformation_file, pulumi_file, verbose, exit_on_destroy) -> None:
+def preview(
+    terraform_file, cloudformation_file, pulumi_file, verbose, exit_on_destroy
+) -> None:
     """Preview infrastructure changes from a plan file."""
     plan = _load_plan(terraform_file, cloudformation_file, pulumi_file)
     if plan is None:
@@ -62,20 +82,43 @@ def preview(terraform_file, cloudformation_file, pulumi_file, verbose, exit_on_d
 
 
 @main.command()
-@click.option("--tf", "terraform_file", type=click.Path(exists=True), help="Terraform plan JSON file")
-@click.option("--cfn", "cloudformation_file", type=click.Path(exists=True), help="CloudFormation change set JSON file")
-@click.option("--pulumi", "pulumi_file", type=click.Path(exists=True), help="Pulumi preview JSON file")
-@click.option("--pricing", "pricing_file", type=click.Path(exists=True), help="Custom pricing JSON file")
+@click.option(
+    "--tf",
+    "terraform_file",
+    type=click.Path(exists=True),
+    help="Terraform plan JSON file",
+)
+@click.option(
+    "--cfn",
+    "cloudformation_file",
+    type=click.Path(exists=True),
+    help="CloudFormation change set JSON file",
+)
+@click.option(
+    "--pulumi",
+    "pulumi_file",
+    type=click.Path(exists=True),
+    help="Pulumi preview JSON file",
+)
+@click.option(
+    "--pricing",
+    "pricing_file",
+    type=click.Path(exists=True),
+    help="Custom pricing JSON file",
+)
 @click.option(
     "--threshold",
     type=float,
     default=None,
     help="Exit with code 1 if total monthly cost delta exceeds this value (e.g. 500 for $500)",
 )
-def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file, threshold) -> None:
+def cost(
+    terraform_file, cloudformation_file, pulumi_file, pricing_file, threshold
+) -> None:
     """Estimate monthly cost impact of infrastructure changes. (Pro feature)"""
     if _HAS_RH_LICENSE:
         from revenueholdings_license import require_tier
+
         require_tier("pro", "deploydiff cost")
     plan = _load_plan(terraform_file, cloudformation_file, pulumi_file)
     if plan is None:
@@ -95,13 +138,29 @@ def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file, thresho
 
 
 @main.command()
-@click.option("--tf", "terraform_file", type=click.Path(exists=True), help="Terraform plan JSON file")
-@click.option("--cfn", "cloudformation_file", type=click.Path(exists=True), help="CloudFormation change set JSON file")
-@click.option("--pulumi", "pulumi_file", type=click.Path(exists=True), help="Pulumi preview JSON file")
+@click.option(
+    "--tf",
+    "terraform_file",
+    type=click.Path(exists=True),
+    help="Terraform plan JSON file",
+)
+@click.option(
+    "--cfn",
+    "cloudformation_file",
+    type=click.Path(exists=True),
+    help="CloudFormation change set JSON file",
+)
+@click.option(
+    "--pulumi",
+    "pulumi_file",
+    type=click.Path(exists=True),
+    help="Pulumi preview JSON file",
+)
 def rollback(terraform_file, cloudformation_file, pulumi_file) -> None:
     """Generate rollback commands for infrastructure changes. (Pro feature)"""
     if _HAS_RH_LICENSE:
         from revenueholdings_license import require_tier
+
         require_tier("pro", "deploydiff rollback")
     plan = _load_plan(terraform_file, cloudformation_file, pulumi_file)
     if plan is None:
@@ -111,7 +170,6 @@ def rollback(terraform_file, cloudformation_file, pulumi_file) -> None:
     commands = generate_rollback_commands(plan)
     for cmd in commands:
         console.print(cmd)
-
 
 
 def _load_plan(
@@ -126,7 +184,9 @@ def _load_plan(
     if len(provided) == 0:
         return None
     if len(provided) > 1:
-        console.print("[red]Error: Provide only one source file (--tf, --cfn, or --pulumi)[/red]")
+        console.print(
+            "[red]Error: Provide only one source file (--tf, --cfn, or --pulumi)[/red]"
+        )
         raise SystemExit(1)
 
     if terraform_file:
@@ -139,7 +199,9 @@ def _load_plan(
     return None
 
 
-def _render_costs(estimates: list[CostEstimate], plan: DeployPlan, console: Console) -> None:
+def _render_costs(
+    estimates: list[CostEstimate], plan: DeployPlan, console: Console
+) -> None:
     """Render cost estimates to the console."""
     from rich import box
     from rich.table import Table
@@ -172,7 +234,9 @@ def _render_costs(estimates: list[CostEstimate], plan: DeployPlan, console: Cons
     if total > 0:
         console.print(f"\n[bold red]Total monthly increase: +${total:.2f}[/bold red]")
     elif total < 0:
-        console.print(f"\n[bold green]Total monthly decrease: -${abs(total):.2f}[/bold green]")
+        console.print(
+            f"\n[bold green]Total monthly decrease: -${abs(total):.2f}[/bold green]"
+        )
     else:
         console.print("\n[bold]Total monthly change: $0.00[/bold]")
 
