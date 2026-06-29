@@ -247,7 +247,7 @@ def _load_pricing(
     if not path.exists():
         return DEFAULT_PRICING.copy()
 
-    with open(path) as f:
+    with path.open() as f:
         custom = json.load(f)
 
     # Merge with defaults (custom overrides)
