@@ -17,7 +17,13 @@ from rich.console import Console
 
 from deploydiff.cli import _load_plan, _render_costs
 from deploydiff.cost_estimator import DEFAULT_PRICING, _load_pricing
-from deploydiff.models import ChangeAction, ChangeSource, CostEstimate, DeployPlan, ResourceChange
+from deploydiff.models import (
+    ChangeAction,
+    ChangeSource,
+    CostEstimate,
+    DeployPlan,
+    ResourceChange,
+)
 from deploydiff.rollback import _pulumi_rollback, generate_rollback_commands
 
 
@@ -152,16 +158,22 @@ class TestPackagingQuality:
         with open(pyproject, "rb") as f:
             data = tomllib.load(f)
         pkg_data = data.get("tool", {}).get("setuptools", {}).get("package-data", {})
-        assert "deploydiff" in pkg_data, \
+        assert "deploydiff" in pkg_data, (
             "Expected [tool.setuptools.package-data] section for 'deploydiff'"
-        assert "py.typed" in pkg_data["deploydiff"], \
+        )
+        assert "py.typed" in pkg_data["deploydiff"], (
             f"Expected 'py.typed' in package-data, got {pkg_data['deploydiff']}"
+        )
 
     def test_ruff_known_first_party(self):
         """ruff known-first-party should be ['deploydiff'], not ['*']."""
         pyproject = Path(__file__).parent.parent / "pyproject.toml"
         with open(pyproject, "rb") as f:
             data = tomllib.load(f)
-        isort_cfg = data.get("tool", {}).get("ruff", {}).get("lint", {}).get("isort", {})
+        isort_cfg = (
+            data.get("tool", {}).get("ruff", {}).get("lint", {}).get("isort", {})
+        )
         kfp = isort_cfg.get("known-first-party", [])
-        assert kfp == ["deploydiff"], f"known-first-party should be ['deploydiff'], got {kfp}"
+        assert kfp == ["deploydiff"], (
+            f"known-first-party should be ['deploydiff'], got {kfp}"
+        )
