@@ -26,13 +26,32 @@ console = Console()
 @click.group()
 @click.version_option(package_name="deploydiff")
 @click.option("--no-gate", is_flag=True, help="Skip license gating check.")
+@click.option(
+    "--require-license",
+    "require_license_flag",
+    is_flag=True,
+    envvar="REVENUEHOLDINGS_REQUIRE_LICENSE",
+    help=(
+        "Exit with an error if revenueholdings-license is not installed "
+        "or if the license check fails. "
+        "Also enabled via REVENUEHOLDINGS_REQUIRE_LICENSE=1."
+    ),
+)
 @click.pass_context
-def main(ctx, no_gate) -> None:
+def main(ctx, no_gate, require_license_flag) -> None:
     """DeployDiff - Preview infrastructure changes with cost impact and rollback."""
     ctx.ensure_object(dict)
     ctx.obj["no_gate"] = no_gate
-    if _HAS_RH_LICENSE and not no_gate:
-        require_license("deploydiff")
+    ctx.obj["require_license_flag"] = require_license_flag
+    if not no_gate:
+        if _HAS_RH_LICENSE:
+            require_license("deploydiff")
+        elif require_license_flag:
+            console.print(
+                "[bold red]Error:[/bold red] revenueholdings-license is not installed. "
+                "Install it with: pip install revenueholdings-license"
+            )
+            raise SystemExit(1)
 
 
 @main.command()
