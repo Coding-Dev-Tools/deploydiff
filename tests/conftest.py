@@ -17,9 +17,5 @@ sys.modules.setdefault("revenueholdings_license.rate_limiter", MagicMock())
 @pytest.fixture(autouse=True)
 def _mock_license(monkeypatch):
     """Ensure license checks stay mocked even if a test reimports."""
-    monkeypatch.setattr(
-        "revenueholdings_license.require_license", MagicMock(return_value=None)
-    )
-    monkeypatch.setattr(
-        "revenueholdings_license.require_tier", MagicMock(return_value=None)
-    )
+    monkeypatch.setattr("revenueholdings_license.require_license", MagicMock(return_value=None))
+    monkeypatch.setattr("revenueholdings_license.require_tier", MagicMock(return_value=None))

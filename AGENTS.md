@@ -16,6 +16,7 @@ Key directories:
 - `tests/` — Test suite
 - `.github/workflows/` — CI/CD (auto-code-review.yml, ci.yml, pages.yml, publish.yml)
 - `dist/` — Built distributions
+- `scripts/` — Automation scripts
 
 ## Conventions
 - Language: Python 3.10+
@@ -27,3 +28,8 @@ Key directories:
 - Dependencies: click, rich, pyyaml, tomli, jinja2
 - CLI entry point: deploydiff.cli:cli
 - Default branch: main
+- Versioning: Semantic versioning (semver)
+- Documentation: Markdown
+
+## Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines and development workflow.

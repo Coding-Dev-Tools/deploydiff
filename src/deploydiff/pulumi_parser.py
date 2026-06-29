@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 
 from .models import ChangeAction, ChangeSource, DeployPlan, ResourceChange
@@ -39,7 +40,7 @@ def parse_pulumi_preview(preview_json: str | dict[str, Any]) -> DeployPlan:
         try:
             data = json.loads(preview_json)
         except json.JSONDecodeError:
-            with open(preview_json) as f:
+            with Path(preview_json).open() as f:
                 data = json.load(f)
     else:
         data = preview_json
