@@ -1,8 +1,9 @@
 """Test configuration - mock license checks so tests run without a license."""
 
-import pytest
 import sys
 from unittest.mock import MagicMock
+
+import pytest
 
 # Replace revenueholdings_license with a mock BEFORE any src imports resolve it
 _mock_rl = MagicMock()
