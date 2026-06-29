@@ -35,24 +35,18 @@ def _terraform_rollback(plan: DeployPlan) -> list[str]:
 
     # For each create, we need to destroy it
     for change in plan.creates:
-        commands.append(
-            f"terraform destroy -target={change.address} -auto-approve"
-        )
+        commands.append(f"terraform destroy -target={change.address} -auto-approve")
 
     # For each destructive change (delete/replace), we need to re-apply it
     for change in plan.destructive_changes:
-        commands.append(
-            f"terraform apply -target={change.address} -auto-approve"
-        )
+        commands.append(f"terraform apply -target={change.address} -auto-approve")
 
     # For updates, we can try to revert with the previous state
     for change in plan.updates:
         commands.append(
             f"# To revert {change.address}, restore previous config and run:"
         )
-        commands.append(
-            f"terraform apply -target={change.address} -auto-approve"
-        )
+        commands.append(f"terraform apply -target={change.address} -auto-approve")
 
     if not plan.changes:
         commands.append("# No changes to roll back")
@@ -75,30 +69,34 @@ def _cloudformation_rollback(plan: DeployPlan) -> list[str]:
 
     stack_name = ""
     if plan.raw_data:
-        stack_name = plan.raw_data.get("StackName", plan.raw_data.get("StackId", "STACK_NAME"))
+        stack_name = plan.raw_data.get(
+            "StackName", plan.raw_data.get("StackId", "STACK_NAME")
+        )
 
     if not stack_name:
         stack_name = "STACK_NAME"
 
     for change in plan.creates:
-        commands.append(
-            f"# Rollback create: remove {change.address}"
-        )
+        commands.append(f"# Rollback create: remove {change.address}")
 
     for change in plan.destructive_changes:
-        commands.append(
-            f"# Rollback delete/replace: re-create {change.address}"
-        )
+        commands.append(f"# Rollback delete/replace: re-create {change.address}")
 
     commands.append("")
     commands.append("# Full stack rollback options:")
-    commands.append("# Option 1: Roll back the stack update (if update-rollback triggered)")
+    commands.append(
+        "# Option 1: Roll back the stack update (if update-rollback triggered)"
+    )
     commands.append(f"aws cloudformation rollback-stack --stack-name {stack_name}")
     commands.append("")
     commands.append("# Option 2: Delete the stack and recreate from previous template")
     commands.append(f"aws cloudformation delete-stack --stack-name {stack_name}")
-    commands.append(f"aws cloudformation wait stack-delete-complete --stack-name {stack_name}")
-    commands.append(f"# Then redeploy with: aws cloudformation create-stack --stack-name {stack_name} ...")
+    commands.append(
+        f"aws cloudformation wait stack-delete-complete --stack-name {stack_name}"
+    )
+    commands.append(
+        f"# Then redeploy with: aws cloudformation create-stack --stack-name {stack_name} ..."
+    )
 
     return commands
 
