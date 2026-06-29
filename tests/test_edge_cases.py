@@ -9,7 +9,10 @@ import json
 from io import StringIO
 from pathlib import Path
 
-import tomllib
+try:
+    import tomllib
+except ImportError:
+    import tomli as tomllib  # Python < 3.11 backport
 from rich.console import Console
 
 from deploydiff.cli import _load_plan, _render_costs
