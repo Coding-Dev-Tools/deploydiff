@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 from pathlib import Path
 
@@ -199,10 +200,7 @@ def _estimate_resource_cost(
     # If deleting, after cost is 0; if creating, before cost is 0
     if before and change.action == ChangeAction.CREATE:
         return 0.0
-    if not before and change.action in (
-        ChangeAction.DELETE,
-        ChangeAction.DELETE_BEFORE_CREATE,
-    ):
+    if not before and change.action == ChangeAction.DELETE:
         return 0.0
 
     resource_type = change.resource_type
@@ -251,7 +249,7 @@ def _load_pricing(
         custom = json.load(f)
 
     # Merge with defaults (custom overrides)
-    merged = DEFAULT_PRICING.copy()
+    merged = copy.deepcopy(DEFAULT_PRICING)
     for resource_type, prices in custom.items():
         if resource_type in merged:
             merged[resource_type].update(prices)
