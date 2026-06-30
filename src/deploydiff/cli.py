@@ -15,6 +15,7 @@ from .terraform_parser import parse_terraform_plan
 
 try:
     from revenueholdings_license import require_license
+
     _HAS_RH_LICENSE = True
 except ImportError:
     _HAS_RH_LICENSE = False
@@ -25,26 +26,64 @@ console = Console()
 @click.group()
 @click.version_option(package_name="deploydiff")
 @click.option("--no-gate", is_flag=True, help="Skip license gating check.")
+@click.option(
+    "--require-license",
+    "require_license_flag",
+    is_flag=True,
+    envvar="REVENUEHOLDINGS_REQUIRE_LICENSE",
+    help=(
+        "Exit with an error if revenueholdings-license is not installed "
+        "or if the license check fails. "
+        "Also enabled via REVENUEHOLDINGS_REQUIRE_LICENSE=1."
+    ),
+)
 @click.pass_context
-def main(ctx, no_gate) -> None:
+def main(ctx, no_gate, require_license_flag) -> None:
     """DeployDiff - Preview infrastructure changes with cost impact and rollback."""
     ctx.ensure_object(dict)
     ctx.obj["no_gate"] = no_gate
-    if _HAS_RH_LICENSE and not no_gate:
-        require_license("deploydiff")
+    ctx.obj["require_license_flag"] = require_license_flag
+    if not no_gate:
+        if _HAS_RH_LICENSE:
+            require_license("deploydiff")
+        elif require_license_flag:
+            console.print(
+                "[bold red]Error:[/bold red] revenueholdings-license is not installed. "
+                "Install it with: pip install revenueholdings-license"
+            )
+            raise SystemExit(1)
 
 
 @main.command()
-@click.option("--tf", "terraform_file", type=click.Path(exists=True), help="Terraform plan JSON file")
-@click.option("--cfn", "cloudformation_file", type=click.Path(exists=True), help="CloudFormation change set JSON file")
-@click.option("--pulumi", "pulumi_file", type=click.Path(exists=True), help="Pulumi preview JSON file")
-@click.option("-v", "--verbose", is_flag=True, help="Show before/after details for each change")
+@click.option(
+    "--tf",
+    "terraform_file",
+    type=click.Path(exists=True),
+    help="Terraform plan JSON file",
+)
+@click.option(
+    "--cfn",
+    "cloudformation_file",
+    type=click.Path(exists=True),
+    help="CloudFormation change set JSON file",
+)
+@click.option(
+    "--pulumi",
+    "pulumi_file",
+    type=click.Path(exists=True),
+    help="Pulumi preview JSON file",
+)
+@click.option(
+    "-v", "--verbose", is_flag=True, help="Show before/after details for each change"
+)
 @click.option(
     "--exit-on-destroy",
     is_flag=True,
     help="Exit with code 1 if the plan contains destructive changes (deletes or replaces)",
 )
-def preview(terraform_file, cloudformation_file, pulumi_file, verbose, exit_on_destroy) -> None:
+def preview(
+    terraform_file, cloudformation_file, pulumi_file, verbose, exit_on_destroy
+) -> None:
     """Preview infrastructure changes from a plan file."""
     plan = _load_plan(terraform_file, cloudformation_file, pulumi_file)
     if plan is None:
@@ -62,20 +101,43 @@ def preview(terraform_file, cloudformation_file, pulumi_file, verbose, exit_on_d
 
 
 @main.command()
-@click.option("--tf", "terraform_file", type=click.Path(exists=True), help="Terraform plan JSON file")
-@click.option("--cfn", "cloudformation_file", type=click.Path(exists=True), help="CloudFormation change set JSON file")
-@click.option("--pulumi", "pulumi_file", type=click.Path(exists=True), help="Pulumi preview JSON file")
-@click.option("--pricing", "pricing_file", type=click.Path(exists=True), help="Custom pricing JSON file")
+@click.option(
+    "--tf",
+    "terraform_file",
+    type=click.Path(exists=True),
+    help="Terraform plan JSON file",
+)
+@click.option(
+    "--cfn",
+    "cloudformation_file",
+    type=click.Path(exists=True),
+    help="CloudFormation change set JSON file",
+)
+@click.option(
+    "--pulumi",
+    "pulumi_file",
+    type=click.Path(exists=True),
+    help="Pulumi preview JSON file",
+)
+@click.option(
+    "--pricing",
+    "pricing_file",
+    type=click.Path(exists=True),
+    help="Custom pricing JSON file",
+)
 @click.option(
     "--threshold",
     type=float,
     default=None,
     help="Exit with code 1 if total monthly cost delta exceeds this value (e.g. 500 for $500)",
 )
-def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file, threshold) -> None:
+def cost(
+    terraform_file, cloudformation_file, pulumi_file, pricing_file, threshold
+) -> None:
     """Estimate monthly cost impact of infrastructure changes. (Pro feature)"""
     if _HAS_RH_LICENSE:
         from revenueholdings_license import require_tier
+
         require_tier("pro", "deploydiff cost")
     plan = _load_plan(terraform_file, cloudformation_file, pulumi_file)
     if plan is None:
@@ -95,13 +157,29 @@ def cost(terraform_file, cloudformation_file, pulumi_file, pricing_file, thresho
 
 
 @main.command()
-@click.option("--tf", "terraform_file", type=click.Path(exists=True), help="Terraform plan JSON file")
-@click.option("--cfn", "cloudformation_file", type=click.Path(exists=True), help="CloudFormation change set JSON file")
-@click.option("--pulumi", "pulumi_file", type=click.Path(exists=True), help="Pulumi preview JSON file")
+@click.option(
+    "--tf",
+    "terraform_file",
+    type=click.Path(exists=True),
+    help="Terraform plan JSON file",
+)
+@click.option(
+    "--cfn",
+    "cloudformation_file",
+    type=click.Path(exists=True),
+    help="CloudFormation change set JSON file",
+)
+@click.option(
+    "--pulumi",
+    "pulumi_file",
+    type=click.Path(exists=True),
+    help="Pulumi preview JSON file",
+)
 def rollback(terraform_file, cloudformation_file, pulumi_file) -> None:
     """Generate rollback commands for infrastructure changes. (Pro feature)"""
     if _HAS_RH_LICENSE:
         from revenueholdings_license import require_tier
+
         require_tier("pro", "deploydiff rollback")
     plan = _load_plan(terraform_file, cloudformation_file, pulumi_file)
     if plan is None:
@@ -111,7 +189,6 @@ def rollback(terraform_file, cloudformation_file, pulumi_file) -> None:
     commands = generate_rollback_commands(plan)
     for cmd in commands:
         console.print(cmd)
-
 
 
 def _load_plan(
@@ -126,7 +203,9 @@ def _load_plan(
     if len(provided) == 0:
         return None
     if len(provided) > 1:
-        console.print("[red]Error: Provide only one source file (--tf, --cfn, or --pulumi)[/red]")
+        console.print(
+            "[red]Error: Provide only one source file (--tf, --cfn, or --pulumi)[/red]"
+        )
         raise SystemExit(1)
 
     if terraform_file:
@@ -139,7 +218,9 @@ def _load_plan(
     return None
 
 
-def _render_costs(estimates: list[CostEstimate], plan: DeployPlan, console: Console) -> None:
+def _render_costs(
+    estimates: list[CostEstimate], plan: DeployPlan, console: Console
+) -> None:
     """Render cost estimates to the console."""
     from rich import box
     from rich.table import Table
@@ -172,7 +253,9 @@ def _render_costs(estimates: list[CostEstimate], plan: DeployPlan, console: Cons
     if total > 0:
         console.print(f"\n[bold red]Total monthly increase: +${total:.2f}[/bold red]")
     elif total < 0:
-        console.print(f"\n[bold green]Total monthly decrease: -${abs(total):.2f}[/bold green]")
+        console.print(
+            f"\n[bold green]Total monthly decrease: -${abs(total):.2f}[/bold green]"
+        )
     else:
         console.print("\n[bold]Total monthly change: $0.00[/bold]")
 
@@ -188,8 +271,7 @@ def mcp() -> None:
         from .mcp_server import run_for_app
     except ImportError as exc:
         console.print(
-            "[red]Error: click-to-mcp is not installed.[/red]\n"
-            "Install it with: [bold]pip install click-to-mcp[/bold]"
+            "[red]Error: click-to-mcp is not installed.[/red]\nInstall it with: [bold]pip install click-to-mcp[/bold]"
         )
         raise SystemExit(1) from exc
 

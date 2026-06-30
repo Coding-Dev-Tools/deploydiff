@@ -9,12 +9,14 @@ description = "Preview infrastructure changes (Terraform, CloudFormation, Pulumi
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
-authors = [{name = "Revenue Holdings"}]
+authors = [{name = "DevForge"}]
 
 dependencies = [
     "click>=8.1",
     "rich>=13.0",
     "pyyaml>=6.0",
+    "tomli>=2.0",
+    "jinja2>=3.1",
 ]
 keywords = ["infrastructure", "terraform", "cloudformation", "pulumi", "cost", "diff", "cli"]
 classifiers = [
@@ -25,6 +27,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 
 [project.optional-dependencies]

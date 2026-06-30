@@ -9,12 +9,19 @@ from deploydiff.cli import main
 from deploydiff.cloudformation_parser import parse_cloudformation_changeset
 from deploydiff.cost_estimator import estimate_costs
 from deploydiff.diff_renderer import render_plan
-from deploydiff.models import ChangeAction, ChangeSource, CostEstimate, DeployPlan, ResourceChange
+from deploydiff.models import (
+    ChangeAction,
+    ChangeSource,
+    CostEstimate,
+    DeployPlan,
+    ResourceChange,
+)
 from deploydiff.pulumi_parser import parse_pulumi_preview
 from deploydiff.rollback import generate_rollback_commands
 from deploydiff.terraform_parser import parse_terraform_plan
 
 # ── Fixtures ──────────────────────────────────────────────────────────────
+
 
 @pytest.fixture
 def sample_terraform_plan():
@@ -41,8 +48,14 @@ def sample_terraform_plan():
                 "provider_name": "registry.terraform.io/hashicorp/aws",
                 "change": {
                     "actions": ["update"],
-                    "before": {"instance_class": "db.t3.small", "allocated_storage": 20},
-                    "after": {"instance_class": "db.t3.medium", "allocated_storage": 50},
+                    "before": {
+                        "instance_class": "db.t3.small",
+                        "allocated_storage": 20,
+                    },
+                    "after": {
+                        "instance_class": "db.t3.medium",
+                        "allocated_storage": 50,
+                    },
                     "before_sensitive": {},
                     "after_sensitive": {},
                 },
@@ -162,25 +175,36 @@ def sample_pulumi_preview():
 
 # ── Model Tests ──────────────────────────────────────────────────────────
 
+
 class TestResourceChange:
     def test_is_destructive_delete(self):
-        rc = ResourceChange("a.b", ChangeAction.DELETE, "aws_instance", "b", ChangeSource.TERRAFORM)
+        rc = ResourceChange(
+            "a.b", ChangeAction.DELETE, "aws_instance", "b", ChangeSource.TERRAFORM
+        )
         assert rc.is_destructive is True
 
     def test_is_destructive_replace(self):
-        rc = ResourceChange("a.b", ChangeAction.REPLACE, "aws_instance", "b", ChangeSource.TERRAFORM)
+        rc = ResourceChange(
+            "a.b", ChangeAction.REPLACE, "aws_instance", "b", ChangeSource.TERRAFORM
+        )
         assert rc.is_destructive is True
 
     def test_is_destructive_create(self):
-        rc = ResourceChange("a.b", ChangeAction.CREATE, "aws_instance", "b", ChangeSource.TERRAFORM)
+        rc = ResourceChange(
+            "a.b", ChangeAction.CREATE, "aws_instance", "b", ChangeSource.TERRAFORM
+        )
         assert rc.is_destructive is False
 
     def test_display_action(self):
-        rc = ResourceChange("a.b", ChangeAction.CREATE, "aws_instance", "b", ChangeSource.TERRAFORM)
+        rc = ResourceChange(
+            "a.b", ChangeAction.CREATE, "aws_instance", "b", ChangeSource.TERRAFORM
+        )
         assert rc.display_action == "+"
 
     def test_display_action_delete(self):
-        rc = ResourceChange("a.b", ChangeAction.DELETE, "aws_instance", "b", ChangeSource.TERRAFORM)
+        rc = ResourceChange(
+            "a.b", ChangeAction.DELETE, "aws_instance", "b", ChangeSource.TERRAFORM
+        )
         assert rc.display_action == "-"
 
 
@@ -215,6 +239,7 @@ class TestDeployPlan:
 
 # ── Terraform Parser Tests ───────────────────────────────────────────────
 
+
 class TestTerraformParser:
     def test_parse_basic_plan(self, sample_terraform_plan):
         plan = parse_terraform_plan(sample_terraform_plan)
@@ -243,9 +268,11 @@ class TestTerraformParser:
     def test_parse_multi_action(self, sample_terraform_plan):
         plan = parse_terraform_plan(sample_terraform_plan)
         multi_changes = [
-        c for c in plan.changes
-        if c.action in (ChangeAction.CREATE_BEFORE_DELETE, ChangeAction.DELETE_BEFORE_CREATE)
-    ]
+            c
+            for c in plan.changes
+            if c.action
+            in (ChangeAction.CREATE_BEFORE_DELETE, ChangeAction.DELETE_BEFORE_CREATE)
+        ]
         assert len(multi_changes) == 1
 
     def test_module_path(self, sample_terraform_plan):
@@ -317,6 +344,7 @@ class TestTerraformParser:
 
 # ── CloudFormation Parser Tests ───────────────────────────────────────────
 
+
 class TestCloudFormationParser:
     def test_parse_basic_changeset(self, sample_cfn_changeset):
         plan = parse_cloudformation_changeset(sample_cfn_changeset)
@@ -352,6 +380,7 @@ class TestCloudFormationParser:
 
 
 # ── Pulumi Parser Tests ──────────────────────────────────────────────────
+
 
 class TestPulumiParser:
     def test_parse_basic_preview(self, sample_pulumi_preview):
@@ -394,6 +423,7 @@ class TestPulumiParser:
     def test_parse_pulumi_urn_malformed_short(self):
         """Two-part URN returns (first, last) parts."""
         from deploydiff.pulumi_parser import _parse_pulumi_urn
+
         resource_type, name = _parse_pulumi_urn("urn:pulumi::something")
         assert resource_type == "urn:pulumi"
         assert name == "something"
@@ -401,6 +431,7 @@ class TestPulumiParser:
     def test_parse_pulumi_urn_single_segment(self):
         """Single-segment URN returns (unknown, full_urn)."""
         from deploydiff.pulumi_parser import _parse_pulumi_urn
+
         resource_type, name = _parse_pulumi_urn("just-a-name")
         assert resource_type == "unknown"
         assert name == "just-a-name"
@@ -408,20 +439,27 @@ class TestPulumiParser:
     def test_extract_provider_azure(self):
         """Azure provider detection from resource type."""
         from deploydiff.pulumi_parser import _extract_provider_from_type
-        assert _extract_provider_from_type("azure-native:resources:ResourceGroup") == "azure"
+
+        assert (
+            _extract_provider_from_type("azure-native:resources:ResourceGroup")
+            == "azure"
+        )
 
     def test_extract_provider_gcp(self):
         """GCP provider detection from resource type."""
         from deploydiff.pulumi_parser import _extract_provider_from_type
+
         assert _extract_provider_from_type("google-native:compute:Instance") == "gcp"
 
     def test_extract_provider_unknown(self):
         """Unknown provider returns 'unknown'."""
         from deploydiff.pulumi_parser import _extract_provider_from_type
+
         assert _extract_provider_from_type("kubernetes:core:Pod") == "unknown"
 
 
 # ── Cost Estimator Tests ─────────────────────────────────────────────────
+
 
 class TestCostEstimator:
     def test_estimate_create_cost(self, sample_terraform_plan):
@@ -439,7 +477,9 @@ class TestCostEstimator:
     def test_delete_has_zero_after_cost(self, sample_terraform_plan):
         plan = parse_terraform_plan(sample_terraform_plan)
         estimates = estimate_costs(plan)
-        logs_est = [e for e in estimates if e.resource_address == "aws_s3_bucket.logs"][0]
+        logs_est = [e for e in estimates if e.resource_address == "aws_s3_bucket.logs"][
+            0
+        ]
         assert logs_est.monthly_cost_after == 0.0
 
     def test_total_monthly_delta(self, sample_terraform_plan):
@@ -466,6 +506,7 @@ class TestCostEstimator:
 
 
 # ── Rollback Tests ────────────────────────────────────────────────────────
+
 
 class TestRollback:
     def test_terraform_rollback(self, sample_terraform_plan):
@@ -495,12 +536,14 @@ class TestRollback:
 
 # ── Renderer Tests ────────────────────────────────────────────────────────
 
+
 class TestRenderer:
     def test_render_basic_plan(self, sample_terraform_plan):
         """Render should not raise errors."""
         from io import StringIO
 
         from rich.console import Console
+
         plan = parse_terraform_plan(sample_terraform_plan)
         buf = StringIO()
         console = Console(file=buf, force_terminal=True)
@@ -514,6 +557,7 @@ class TestRenderer:
         from io import StringIO
 
         from rich.console import Console
+
         plan = DeployPlan(source=ChangeSource.TERRAFORM, changes=[])
         buf = StringIO()
         console = Console(file=buf, force_terminal=True)
@@ -527,6 +571,7 @@ class TestRenderer:
         from io import StringIO
 
         from rich.console import Console
+
         plan = parse_terraform_plan(sample_terraform_plan)
         buf = StringIO()
         console = Console(file=buf, force_terminal=True)
@@ -540,6 +585,7 @@ class TestRenderer:
         from io import StringIO
 
         from rich.console import Console
+
         change = ResourceChange(
             address="aws_db_instance.db",
             action=ChangeAction.UPDATE,
@@ -566,6 +612,7 @@ class TestRenderer:
         from io import StringIO
 
         from rich.console import Console
+
         plan = parse_terraform_plan(sample_terraform_plan)
         buf = StringIO()
         console = Console(file=buf, force_terminal=True)
@@ -579,6 +626,7 @@ class TestRenderer:
         from io import StringIO
 
         from rich.console import Console
+
         changes = [
             ResourceChange(
                 address="aws_instance.web",
@@ -607,6 +655,7 @@ class TestRenderer:
         from io import StringIO
 
         from rich.console import Console
+
         plan = parse_cloudformation_changeset(sample_cfn_changeset)
         buf = StringIO()
         console = Console(file=buf, force_terminal=True)
@@ -620,6 +669,7 @@ class TestRenderer:
         from io import StringIO
 
         from rich.console import Console
+
         plan = parse_pulumi_preview(sample_pulumi_preview)
         buf = StringIO()
         console = Console(file=buf, force_terminal=True)
@@ -632,6 +682,7 @@ class TestRenderer:
         from io import StringIO
 
         from rich.console import Console
+
         change = ResourceChange(
             address="module.vpc.aws_nat_gateway.main",
             action=ChangeAction.REPLACE,
@@ -656,6 +707,7 @@ class TestRenderer:
         from rich.console import Console
 
         from deploydiff.diff_renderer import _render_change_details
+
         change = ResourceChange(
             address="aws_instance.web",
             action=ChangeAction.CREATE,
@@ -675,6 +727,7 @@ class TestRenderer:
     def test_group_by_action(self):
         """Grouping changes by action produces correct buckets."""
         from deploydiff.diff_renderer import _group_by_action
+
         changes = [
             ResourceChange("a", ChangeAction.CREATE, "t", "n", ChangeSource.TERRAFORM),
             ResourceChange("b", ChangeAction.CREATE, "t", "n", ChangeSource.TERRAFORM),
@@ -697,23 +750,27 @@ class TestRenderer:
     def test_render_create_before_delete_action_label(self):
         """Create-before-delete action has the right label."""
         from deploydiff.diff_renderer import ACTION_LABELS
+
         label = ACTION_LABELS[ChangeAction.CREATE_BEFORE_DELETE]
         assert "create-first" in label
 
     def test_render_no_op_label(self):
         """No-op action has the right label."""
         from deploydiff.diff_renderer import ACTION_LABELS
+
         label = ACTION_LABELS[ChangeAction.NO_OP]
         assert label == "no changes"
 
     def test_render_import_action_label(self):
         """Import action has the right label."""
         from deploydiff.diff_renderer import ACTION_LABELS
+
         label = ACTION_LABELS[ChangeAction.IMPORT]
         assert "imported" in label
 
 
 # ── CLI Integration Tests ─────────────────────────────────────────────────
+
 
 class TestCLI:
     def test_cli_help(self):
@@ -806,16 +863,22 @@ class TestCLI:
         tf_file = tmp_path / "safe_plan.json"
         tf_file.write_text(json.dumps(safe_plan))
         runner = CliRunner()
-        result = runner.invoke(main, ["preview", "--tf", str(tf_file), "--exit-on-destroy"])
+        result = runner.invoke(
+            main, ["preview", "--tf", str(tf_file), "--exit-on-destroy"]
+        )
         assert result.exit_code == 0
 
-    def test_preview_exit_on_destroy_with_destroy(self, sample_terraform_plan, tmp_path):
+    def test_preview_exit_on_destroy_with_destroy(
+        self, sample_terraform_plan, tmp_path
+    ):
         """--exit-on-destroy exits 1 when plan has destructive changes (deletes/replaces)."""
         tf_file = tmp_path / "plan.json"
         tf_file.write_text(json.dumps(sample_terraform_plan))
         runner = CliRunner()
         # terraform fixture has a delete + replace (destructive)
-        result = runner.invoke(main, ["preview", "--tf", str(tf_file), "--exit-on-destroy"])
+        result = runner.invoke(
+            main, ["preview", "--tf", str(tf_file), "--exit-on-destroy"]
+        )
         assert result.exit_code == 1
         assert "destructive" in result.output.lower()
 
@@ -825,7 +888,9 @@ class TestCLI:
         tf_file.write_text(json.dumps(sample_terraform_plan))
         runner = CliRunner()
         # Total delta for fixture is $6.50, so $1000 threshold should pass
-        result = runner.invoke(main, ["cost", "--tf", str(tf_file), "--threshold", "1000"])
+        result = runner.invoke(
+            main, ["cost", "--tf", str(tf_file), "--threshold", "1000"]
+        )
         assert result.exit_code == 0
 
     def test_cost_threshold_exceeded(self, sample_terraform_plan, tmp_path):
@@ -840,14 +905,18 @@ class TestCLI:
 
     # ── Missing CLI edge-case tests ─────────────────────────────────
 
-    def test_preview_multiple_sources(self, sample_terraform_plan, sample_cfn_changeset, tmp_path):
+    def test_preview_multiple_sources(
+        self, sample_terraform_plan, sample_cfn_changeset, tmp_path
+    ):
         """Preview exits 1 when multiple source files are provided."""
         tf_file = tmp_path / "plan.json"
         cfn_file = tmp_path / "changeset.json"
         tf_file.write_text(json.dumps(sample_terraform_plan))
         cfn_file.write_text(json.dumps(sample_cfn_changeset))
         runner = CliRunner()
-        result = runner.invoke(main, ["preview", "--tf", str(tf_file), "--cfn", str(cfn_file)])
+        result = runner.invoke(
+            main, ["preview", "--tf", str(tf_file), "--cfn", str(cfn_file)]
+        )
         assert result.exit_code == 1
         assert "only one" in result.output.lower()
 
@@ -888,7 +957,9 @@ class TestCLI:
         runner = CliRunner()
         result = runner.invoke(main, ["rollback", "--cfn", str(cfn_file)])
         assert result.exit_code == 0
-        assert "cloudformation" in result.output.lower() or "aws" in result.output.lower()
+        assert (
+            "cloudformation" in result.output.lower() or "aws" in result.output.lower()
+        )
 
     def test_cost_help(self):
         """Cost --help shows expected options."""
@@ -912,6 +983,7 @@ class TestCLI:
 
 
 # ── Terraform Parser Additional Tests ────────────────────────────────────
+
 
 class TestTerraformParserExtended:
     def test_parse_noop_action(self):
@@ -1011,6 +1083,7 @@ class TestTerraformParserExtended:
 
 # ── Pulumi Parser Additional Tests ───────────────────────────────────────
 
+
 class TestPulumiParserExtended:
     def test_parse_from_json_string(self, sample_pulumi_preview):
         json_str = json.dumps(sample_pulumi_preview)
@@ -1098,12 +1171,16 @@ class TestPulumiParserExtended:
             "steps": [
                 {
                     "step": "create",
-                    "new": {"urn": "urn:pulumi:prod::myapp::aws:s3/bucket:Bucket::b", "bucket": "b"},
+                    "new": {
+                        "urn": "urn:pulumi:prod::myapp::aws:s3/bucket:Bucket::b",
+                        "bucket": "b",
+                    },
                 }
             ]
         }
         plan = parse_pulumi_preview(data)
         assert len(plan.changes) == 1
+
     def test_mcp_without_click_to_mcp(self):
         """MCP command exits 1 when click-to-mcp is not installed."""
         runner = CliRunner()

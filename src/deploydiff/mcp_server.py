@@ -17,9 +17,9 @@ def run_mcp() -> None:
         import click_to_mcp
     except ImportError:
         import sys
+
         print(
-            "Error: click-to-mcp is not installed. "
-            "Install it with: pip install click-to-mcp",
+            "Error: click-to-mcp is not installed. Install it with: pip install click-to-mcp",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -35,9 +35,9 @@ def run_for_app(app: object) -> None:
         import click_to_mcp
     except ImportError:
         import sys
+
         print(
-            "Error: click-to-mcp is not installed. "
-            "Install it with: pip install click-to-mcp",
+            "Error: click-to-mcp is not installed. Install it with: pip install click-to-mcp",
             file=sys.stderr,
         )
         sys.exit(1)

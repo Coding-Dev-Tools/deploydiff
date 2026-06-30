@@ -153,7 +153,9 @@ DEFAULT_PRICING: dict[str, dict[str, float]] = {
 }
 
 
-def estimate_costs(plan: DeployPlan, pricing_file: str | Path | None = None) -> list[CostEstimate]:
+def estimate_costs(
+    plan: DeployPlan, pricing_file: str | Path | None = None
+) -> list[CostEstimate]:
     """Estimate monthly cost impact for each resource change in a plan.
 
     Args:
@@ -197,7 +199,10 @@ def _estimate_resource_cost(
     # If deleting, after cost is 0; if creating, before cost is 0
     if before and change.action == ChangeAction.CREATE:
         return 0.0
-    if not before and change.action in (ChangeAction.DELETE, ChangeAction.DELETE_BEFORE_CREATE):
+    if not before and change.action in (
+        ChangeAction.DELETE,
+        ChangeAction.DELETE_BEFORE_CREATE,
+    ):
         return 0.0
 
     resource_type = change.resource_type
@@ -206,7 +211,14 @@ def _estimate_resource_cost(
     # Try to find an instance type / size key in the resource config
     data = change.before if before else change.after
     if data and isinstance(data, dict):
-        for field in ("instance_type", "InstanceType", "node_type", "NodeType", "volume_type", "engine"):
+        for field in (
+            "instance_type",
+            "InstanceType",
+            "node_type",
+            "NodeType",
+            "volume_type",
+            "engine",
+        ):
             val = data.get(field, "")
             if val and str(val) in type_pricing:
                 return type_pricing[str(val)]
@@ -224,7 +236,9 @@ def _build_cost_description(change: ResourceChange, before: float, after: float)
     return "no change"
 
 
-def _load_pricing(pricing_file: str | Path | None = None) -> dict[str, dict[str, float]]:
+def _load_pricing(
+    pricing_file: str | Path | None = None,
+) -> dict[str, dict[str, float]]:
     """Load pricing data from a custom file, falling back to defaults."""
     if pricing_file is None:
         return DEFAULT_PRICING.copy()
@@ -233,7 +247,7 @@ def _load_pricing(pricing_file: str | Path | None = None) -> dict[str, dict[str,
     if not path.exists():
         return DEFAULT_PRICING.copy()
 
-    with open(path) as f:
+    with path.open() as f:
         custom = json.load(f)
 
     # Merge with defaults (custom overrides)

@@ -35,7 +35,9 @@ ACTION_LABELS: dict[ChangeAction, str] = {
 }
 
 
-def render_plan(plan: DeployPlan, console: Console | None = None, verbose: bool = False) -> None:
+def render_plan(
+    plan: DeployPlan, console: Console | None = None, verbose: bool = False
+) -> None:
     """Render a full deployment plan to the console.
 
     Args:
@@ -49,7 +51,9 @@ def render_plan(plan: DeployPlan, console: Console | None = None, verbose: bool 
     # Header
     source_name = plan.source.value.capitalize()
     console.print()
-    console.print(Panel(f"[bold]DeployDiff: {source_name} Plan Preview[/bold]", style="blue"))
+    console.print(
+        Panel(f"[bold]DeployDiff: {source_name} Plan Preview[/bold]", style="blue")
+    )
 
     # Summary
     _render_summary(plan, console)
@@ -63,7 +67,9 @@ def render_plan(plan: DeployPlan, console: Console | None = None, verbose: bool 
     destructive = plan.destructive_changes
     if destructive:
         console.print()
-        console.print(f"[bold red]⚠ {len(destructive)} destructive change(s) detected![/bold red]")
+        console.print(
+            f"[bold red]⚠ {len(destructive)} destructive change(s) detected![/bold red]"
+        )
 
     console.print()
 
@@ -104,7 +110,9 @@ def _render_action_group(
     label = ACTION_LABELS.get(action, "will change")
 
     console.print()
-    console.print(f"[{color}][bold]{len(changes)} resource(s) {label}:[/bold][/{color}]")
+    console.print(
+        f"[{color}][bold]{len(changes)} resource(s) {label}:[/bold][/{color}]"
+    )
 
     table = Table(box=box.SIMPLE, show_header=True, padding=(0, 1))
     table.add_column("", width=3)
@@ -156,7 +164,9 @@ def _render_change_details(change: ResourceChange, console: Console) -> None:
         if before_val == after_val:
             console.print(f"    {key}: {before_val}")
         else:
-            console.print(f"    {key}: [red]- {before_val}[/red]  [green]+ {after_val}[/green]")
+            console.print(
+                f"    {key}: [red]- {before_val}[/red]  [green]+ {after_val}[/green]"
+            )
 
 
 def _group_by_action(plan: DeployPlan) -> dict[ChangeAction, list[ResourceChange]]:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 
 from .models import ChangeAction, ChangeSource, DeployPlan, ResourceChange
@@ -33,7 +34,7 @@ def parse_terraform_plan(plan_json: str | dict[str, Any]) -> DeployPlan:
             data = json.loads(plan_json)
         except json.JSONDecodeError:
             # Try as file path
-            with open(plan_json) as f:
+            with Path(plan_json).open() as f:
                 data = json.load(f)
     else:
         data = plan_json
@@ -72,9 +73,7 @@ def parse_terraform_plan(plan_json: str | dict[str, Any]) -> DeployPlan:
             else set()
         )
         after_sensitive = (
-            set(change.get("after_sensitive", {}).keys())
-            if isinstance(change.get("after_sensitive"), dict)
-            else set()
+            set(change.get("after_sensitive", {}).keys()) if isinstance(change.get("after_sensitive"), dict) else set()
         )
 
         resource_change = ResourceChange(

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 
 from .models import ChangeAction, ChangeSource, DeployPlan, ResourceChange
@@ -39,7 +40,7 @@ def parse_pulumi_preview(preview_json: str | dict[str, Any]) -> DeployPlan:
         try:
             data = json.loads(preview_json)
         except json.JSONDecodeError:
-            with open(preview_json) as f:
+            with Path(preview_json).open() as f:
                 data = json.load(f)
     else:
         data = preview_json
@@ -65,8 +66,16 @@ def parse_pulumi_preview(preview_json: str | dict[str, Any]) -> DeployPlan:
         old_state = step.get("old", {})
         new_state = step.get("new", {})
 
-        before = {k: v for k, v in old_state.items() if k not in ("urn", "id")} if old_state else None
-        after = {k: v for k, v in new_state.items() if k not in ("urn", "id")} if new_state else None
+        before = (
+            {k: v for k, v in old_state.items() if k not in ("urn", "id")}
+            if old_state
+            else None
+        )
+        after = (
+            {k: v for k, v in new_state.items() if k not in ("urn", "id")}
+            if new_state
+            else None
+        )
 
         provider = _extract_provider_from_type(resource_type)
 
