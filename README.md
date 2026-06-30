@@ -148,3 +148,15 @@ DeployDiff is one of 11 tools in the Revenue Holdings suite. One license covers 
 ## License
 
 MIT
+
+## Install
+
+```bash
+npm install
+```
+
+## Test
+
+```bash
+npm test  # runs: node --test tests/
+```

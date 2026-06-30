@@ -71,6 +71,7 @@ Thumbs.db
 research/
 fixtures/generated/
 .ruff_cache/
+<<<<<<< Updated upstream
 .secrets.baseline
 
 # Merge artifacts and cache (added by workspace stabilization)
@@ -84,3 +85,8 @@ fixtures/generated/
 *.REMOTE.*
 local.db
 *.sqlite3
+=======
+
+# Added by release-prep
+node_modules
+>>>>>>> Stashed changes
