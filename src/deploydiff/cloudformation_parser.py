@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 
 from .models import ChangeAction, ChangeSource, DeployPlan, ResourceChange
@@ -41,7 +42,12 @@ def parse_cloudformation_changeset(changeset_json: str | dict[str, Any]) -> Depl
         try:
             data = json.loads(changeset_json)
         except json.JSONDecodeError:
-            with open(changeset_json) as f:
+            path = Path(changeset_json)
+            if not path.is_file():
+                raise FileNotFoundError(
+                    f"Input is neither valid JSON nor an existing file: {changeset_json!r}"
+                ) from None
+            with open(path) as f:
                 data = json.load(f)
     else:
         data = changeset_json
@@ -76,7 +82,6 @@ def parse_cloudformation_changeset(changeset_json: str | dict[str, Any]) -> Depl
         )
 
         # Scope details for update changes
-        resource_change_data.get("Scope", [])
         details = resource_change_data.get("Details", [])
 
         before = {}
@@ -99,8 +104,6 @@ def parse_cloudformation_changeset(changeset_json: str | dict[str, Any]) -> Depl
             provider="aws",
         )
         changes.append(resource_change)
-
-    data.get("StackName", data.get("ChangeSetName", "unknown"))
 
     return DeployPlan(
         source=ChangeSource.CLOUDFORMATION,

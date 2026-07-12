@@ -34,7 +34,12 @@ def parse_terraform_plan(plan_json: str | dict[str, Any]) -> DeployPlan:
             data = json.loads(plan_json)
         except json.JSONDecodeError:
             # Try as file path
-            with Path(plan_json).open() as f:
+            path = Path(plan_json)
+            if not path.is_file():
+                raise FileNotFoundError(
+                    f"Input is neither valid JSON nor an existing file: {plan_json!r}"
+                ) from None
+            with path.open() as f:
                 data = json.load(f)
     else:
         data = plan_json
@@ -43,7 +48,6 @@ def parse_terraform_plan(plan_json: str | dict[str, Any]) -> DeployPlan:
     changes: list[ResourceChange] = []
 
     # Parse planned changes
-    data.get("planned_values", {})
     resource_changes = data.get("resource_changes", [])
 
     for rc in resource_changes:
@@ -90,10 +94,6 @@ def parse_terraform_plan(plan_json: str | dict[str, Any]) -> DeployPlan:
             provider=provider,
         )
         changes.append(resource_change)
-
-    # Parse output changes
-    data.get("output_changes", {})
-    # We track these as metadata but don't create ResourceChange entries
 
     return DeployPlan(
         source=ChangeSource.TERRAFORM,

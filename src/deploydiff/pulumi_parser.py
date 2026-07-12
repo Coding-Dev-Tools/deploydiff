@@ -40,7 +40,12 @@ def parse_pulumi_preview(preview_json: str | dict[str, Any]) -> DeployPlan:
         try:
             data = json.loads(preview_json)
         except json.JSONDecodeError:
-            with Path(preview_json).open() as f:
+            path = Path(preview_json)
+            if not path.is_file():
+                raise FileNotFoundError(
+                    f"Input is neither valid JSON nor an existing file: {preview_json!r}"
+                ) from None
+            with path.open() as f:
                 data = json.load(f)
     else:
         data = preview_json
