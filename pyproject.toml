@@ -36,6 +36,7 @@ classifiers = [
 # tiers:  pip install deploydiff[license]
 license = [
     "revenueholdings_license @ git+https://github.com/Coding-Dev-Tools/revenueholdings_license.git",
+    "revenueholdings-license>=0.1.0",
 ]
 dev = [
     "pytest>=7.0",

@@ -38,6 +38,8 @@ All notable changes to DeployDiff CLI will be documented in this file.
 ### Fixed
 
 - GitHub Actions versions downgraded to stable v4/v5 (v6 caused workflow parse failures)
+- All three parsers (Terraform, CloudFormation, Pulumi) now raise a clear `FileNotFoundError` when input is neither valid JSON nor an existing file path, instead of a cryptic `FileNotFoundError`/`PermissionError` from `open()`
+- Removed dead `.get()` calls in terraform_parser and cloudformation_parser (orphaned `data.get("planned_values")`, `data.get("output_changes")`, `resource_change_data.get("Scope")`, `data.get("StackName")`) that looked like they were processing data but silently discarded results — silent-failure traps removed
 - YAML indentation in CI workflows
 - Git merge conflicts resolved in dependabot.yml, publish.yml, and pyproject.toml
 - UTF-8 encoding (mojibake) in file output

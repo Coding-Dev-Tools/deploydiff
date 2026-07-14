@@ -16,7 +16,7 @@ except ImportError:
 from rich.console import Console
 
 from deploydiff.cli import _load_plan, _render_costs
-from deploydiff.cost_estimator import DEFAULT_PRICING, _load_pricing
+from deploydiff.cost_estimator import DEFAULT_PRICING, _load_pricing, estimate_costs
 from deploydiff.models import (
     ChangeAction,
     ChangeSource,
@@ -93,6 +93,25 @@ class TestCostEstimatorEdgeCases:
         assert pricing["aws_lambda_function"]["custom_size"] == 5.0
         # Defaults should still be present
         assert "t3.micro" in pricing["aws_instance"]
+
+    def test_delete_before_create_has_nonzero_after_cost(self):
+        """DELETE_BEFORE_CREATE should report the new resource cost as after_cost."""
+        pricing = _load_pricing()
+        change = ResourceChange(
+            address="aws_instance.replaced",
+            action=ChangeAction.DELETE_BEFORE_CREATE,
+            resource_type="aws_instance",
+            resource_name="replaced",
+            source=ChangeSource.TERRAFORM,
+            before={"instance_type": "t3.micro"},
+            after={"instance_type": "t3.large"},
+        )
+        plan = DeployPlan(source=ChangeSource.TERRAFORM, changes=[change])
+        estimates = estimate_costs(plan)
+        assert len(estimates) == 1
+        est = estimates[0]
+        assert est.monthly_cost_before == pricing["aws_instance"]["t3.micro"]
+        assert est.monthly_cost_after == pricing["aws_instance"]["t3.large"]
 
 
 class TestRollbackEdgeCases:
