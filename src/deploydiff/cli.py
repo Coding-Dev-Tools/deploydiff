@@ -271,7 +271,7 @@ def mcp() -> None:
         from .mcp_server import run_for_app
     except ImportError as exc:
         console.print(
-            "[red]Error: click-to-mcp is not installed.[/red]\nInstall it with: [bold]pip install click-to-mcp[/bold]"
+            "[red]Error: click-to-mcp is not installed.[/red]\nInstall it with: [bold]pip install git+https://github.com/Coding-Dev-Tools/click-to-mcp.git[/bold]"
         )
         raise SystemExit(1) from exc
 
