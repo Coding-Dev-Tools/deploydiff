@@ -4,7 +4,10 @@
 Compare deployment configurations across environments. Detect drift between staging and production configs. Preview infrastructure changes with human-readable diffs, cost impact estimation, and rollback commands.
 
 ## Build & Test Commands
-- Install: `pip install -e .` or `pip install deploydiff`
+- Install (editable, from this repo): `pip install -e .`
+- Install (prebuilt wheel from the self-hosted index): `pip install --index-url https://coding-dev-tools.github.io/pypi-index/simple/ deploydiff`
+- Install (from source): `pip install git+https://github.com/Coding-Dev-Tools/deploydiff.git`
+- NOTE: `deploydiff` is NOT on public PyPI — use the self-hosted index or a `git+` URL above.
 - Test: `pytest tests/` (or `python -m pytest tests/ -v --tb=short`)
 - Lint: `ruff check .`
 - Build: `pip install build twine && python -m build && twine check dist/*`
