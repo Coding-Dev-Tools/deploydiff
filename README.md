@@ -11,15 +11,12 @@ Preview infrastructure changes with human-readable diffs, cost impact estimation
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Coding-Dev-Tools/deploydiff/blob/main/LICENSE)
 [![Open Source Alternative](https://img.shields.io/badge/Open_Source_Alternative-%E2%87%92-blue?logo=opensourceinitiative)](https://www.opensourcealternative.to/project/deploydiff)
 |[![LibHunt](https://img.shields.io/badge/LibHunt-%E2%87%92-blue?logo=codeigniter)](https://www.libhunt.com/r/Coding-Dev-Tools/deploydiff)
-|[![PyPI](https://img.shields.io/pypi/v/deploydiff)](https://pypi.org/project/deploydiff/)
+|[![PyPI](https://img.shields.io/badge/PyPI-not%20published-orange)](https://github.com/Coding-Dev-Tools/deploydiff#installation)|
 
 ## Installation
 
-```bash
-pip install deploydiff
-```
+DeployDiff is not published on public PyPI (publishing is pending). Install directly from GitHub:
 
-Or install the latest version directly from GitHub:
 ```bash
 pip install git+https://github.com/Coding-Dev-Tools/deploydiff.git
 ```

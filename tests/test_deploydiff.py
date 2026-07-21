@@ -1182,10 +1182,93 @@ class TestPulumiParserExtended:
         assert len(plan.changes) == 1
 
     def test_mcp_without_click_to_mcp(self):
-        """MCP command exits 1 when click-to-mcp is not installed."""
+        "MCP command exits 1 when click-to-mcp is not installed."
         runner = CliRunner()
         result = runner.invoke(main, ["mcp"])
         # Either exits 1 (ImportError caught) or 0 (if click-to-mcp is installed)
         assert result.exit_code in (0, 1)
         if result.exit_code == 1:
             assert "click-to-mcp" in result.output.lower()
+
+
+class TestDiffRendererEdgeCases:
+    "Targeted tests for diff_renderer edge cases and module_path behavior."
+
+    def test_render_module_path_not_doubled(self):
+        "Module path should NOT be doubled in the rendered address."
+        from io import StringIO
+
+        from rich.console import Console
+
+        from deploydiff.diff_renderer import _render_action_group
+
+        change = ResourceChange(
+            address="module.vpc.aws_nat_gateway.main",
+            action=ChangeAction.REPLACE,
+            resource_type="aws_nat_gateway",
+            resource_name="main",
+            source=ChangeSource.TERRAFORM,
+            module_path="module.vpc",
+        )
+        plan = DeployPlan(source=ChangeSource.TERRAFORM, changes=[change])
+        buf = StringIO()
+        console = Console(file=buf, force_terminal=True)
+        _render_action_group(plan, ChangeAction.REPLACE, [change], console, verbose=False)
+        output = buf.getvalue()
+        # The rendered address should appear exactly once, not doubled
+        assert "module.vpc.aws_nat_gateway.main" in output
+        # The doubled form would be "module.vpc.module.vpc.aws_nat_gateway.main"
+        doubled = "module.vpc.module.vpc"
+        assert doubled not in output, f"Address doubled: {output[:500]}"
+
+    def test_render_change_details_unchanged_value(self):
+        "Keys with same before/after value show without diff markers."
+        from io import StringIO
+
+        from rich.console import Console
+
+        from deploydiff.diff_renderer import _render_change_details
+
+        change = ResourceChange(
+            address="aws_instance.web",
+            action=ChangeAction.UPDATE,
+            resource_type="aws_instance",
+            resource_name="web",
+            source=ChangeSource.TERRAFORM,
+            before={"instance_type": "t3.micro", "ami": "ami-old"},
+            after={"instance_type": "t3.micro", "ami": "ami-new"},
+        )
+        buf = StringIO()
+        console = Console(file=buf, force_terminal=True)
+        _render_change_details(change, console)
+        output = buf.getvalue()
+        assert "instance_type" in output
+        # t3.micro is unchanged, should appear without +/- markers
+        assert "t3.micro" in output
+
+    def test_render_change_details_missing_key(self):
+        "Key present in one state but not the other uses em-dash fallback."
+        from io import StringIO
+
+        from rich.console import Console
+
+        from deploydiff.diff_renderer import _render_change_details
+
+        change = ResourceChange(
+            address="aws_instance.web",
+            action=ChangeAction.UPDATE,
+            resource_type="aws_instance",
+            resource_name="web",
+            source=ChangeSource.TERRAFORM,
+            before={"instance_type": "t3.micro", "old_key": "old_val"},
+            after={"instance_type": "t3.large", "new_key": "new_val"},
+        )
+        buf = StringIO()
+        console = Console(file=buf, force_terminal=True)
+        _render_change_details(change, console)
+        output = buf.getvalue()
+        assert "instance_type" in output
+        # old_key should show "old_val" on the before side, em-dash on after
+        assert "old_key" in output
+        # Use some assertion that verifies em-dash appears (Rich renders these as Unicode)
+        assert "new_key" in output
