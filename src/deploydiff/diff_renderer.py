@@ -123,8 +123,6 @@ def _render_action_group(
     for change in changes:
         symbol = change.display_action
         addr = change.address
-        if change.module_path:
-            addr = f"{change.module_path}.{addr}"
         table.add_row(
             f"[{color}]{symbol}[/{color}]",
             f"[{color}]{addr}[/{color}]",
