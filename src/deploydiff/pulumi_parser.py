@@ -50,6 +50,9 @@ def parse_pulumi_preview(preview_json: str | dict[str, Any]) -> DeployPlan:
     else:
         data = preview_json
 
+    if not isinstance(data, dict):
+        raise ValueError("Preview input must be a JSON object")
+
     changes: list[ResourceChange] = []
 
     # Pulumi preview JSON has a "steps" array

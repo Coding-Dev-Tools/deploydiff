@@ -59,3 +59,16 @@ class TestParserErrorHandling:
         data = {"Changes": []}
         plan = parse_cloudformation_changeset(data)
         assert len(plan.changes) == 0
+
+    @pytest.mark.parametrize(
+        ("parser", "payload"),
+        [
+            (parse_terraform_plan, []),
+            (parse_cloudformation_changeset, []),
+            (parse_pulumi_preview, []),
+        ],
+    )
+    def test_json_array_is_rejected_with_clear_error(self, parser, payload):
+        """A decoded JSON value must be an object before parser-specific access."""
+        with pytest.raises(ValueError, match="JSON object"):
+            parser(payload)

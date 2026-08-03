@@ -44,6 +44,9 @@ def parse_terraform_plan(plan_json: str | dict[str, Any]) -> DeployPlan:
     else:
         data = plan_json
 
+    if not isinstance(data, dict):
+        raise ValueError("Plan input must be a JSON object")
+
     format_version = data.get("format_version", "")
     changes: list[ResourceChange] = []
 
