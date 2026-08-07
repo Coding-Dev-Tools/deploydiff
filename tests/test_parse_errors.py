@@ -72,3 +72,36 @@ class TestParserErrorHandling:
         """A decoded JSON value must be an object before parser-specific access."""
         with pytest.raises(ValueError, match="JSON object"):
             parser(payload)
+
+    @pytest.mark.parametrize(
+        ("parser", "payload", "message"),
+        [
+            (
+                parse_terraform_plan,
+                {"resource_changes": {}},
+                "resource_changes must be a JSON array",
+            ),
+            (
+                parse_cloudformation_changeset,
+                {"Changes": {}},
+                "Changes must be a JSON array",
+            ),
+            (
+                parse_pulumi_preview,
+                {"steps": {}},
+                "steps must be a JSON array",
+            ),
+        ],
+    )
+    def test_malformed_collections_raise_clear_error(self, parser, payload, message):
+        """Malformed collection fields must not be silently ignored."""
+        with pytest.raises(ValueError, match=message):
+            parser(payload)
+
+    def test_terraform_malformed_resource_entry_is_rejected(self):
+        with pytest.raises(ValueError, match=r"resource_changes\[0\].*JSON object"):
+            parse_terraform_plan({"resource_changes": ["not-an-object"]})
+
+    def test_pulumi_negative_resource_count_is_rejected(self):
+        with pytest.raises(ValueError, match="non-negative integer"):
+            parse_pulumi_preview({"resourceChanges": {"aws:s3/bucket:Bucket": {"create": -1}}})

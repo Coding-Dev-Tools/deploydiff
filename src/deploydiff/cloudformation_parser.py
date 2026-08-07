@@ -57,11 +57,19 @@ def parse_cloudformation_changeset(changeset_json: str | dict[str, Any]) -> Depl
 
     changes: list[ResourceChange] = []
     changes_list = data.get("Changes", data.get("changes", []))
+    if not isinstance(changes_list, list):
+        raise ValueError("CloudFormation Changes must be a JSON array")
 
-    for change_entry in changes_list:
+    for index, change_entry in enumerate(changes_list):
+        if not isinstance(change_entry, dict):
+            raise ValueError(f"CloudFormation Changes[{index}] must be a JSON object")
         resource_change_data = change_entry.get(
             "ResourceChange", change_entry.get("resource_change", {})
         )
+        if not isinstance(resource_change_data, dict):
+            raise ValueError(
+                f"CloudFormation Changes[{index}].ResourceChange must be a JSON object"
+            )
         action_str = change_entry.get(
             "Action", resource_change_data.get("Action", "Modify")
         )
