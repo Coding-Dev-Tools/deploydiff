@@ -15,9 +15,13 @@ Preview infrastructure changes with human-readable diffs, cost impact estimation
 
 ## Installation
 
-DeployDiff is not published on public PyPI (publishing is pending). Install directly from GitHub:
+DeployDiff is not published on public PyPI. Install from the self-hosted index, GitHub, Homebrew, or Scoop:
 
 ```bash
+# Self-hosted PyPI index (easiest for pip users)
+pip install --extra-index-url https://coding-dev-tools.github.io/pypi-index/simple/ deploydiff
+
+# Or directly from GitHub
 pip install git+https://github.com/Coding-Dev-Tools/deploydiff.git
 ```
 
