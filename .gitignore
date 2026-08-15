@@ -87,3 +87,6 @@ local.db
 
 # Added by release-prep
 node_modules
+
+# npm lock artifact (Python-only project)
+package-lock.json
