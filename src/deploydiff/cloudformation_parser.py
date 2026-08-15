@@ -63,16 +63,10 @@ def parse_cloudformation_changeset(changeset_json: str | dict[str, Any]) -> Depl
     for index, change_entry in enumerate(changes_list):
         if not isinstance(change_entry, dict):
             raise ValueError(f"CloudFormation Changes[{index}] must be a JSON object")
-        resource_change_data = change_entry.get(
-            "ResourceChange", change_entry.get("resource_change", {})
-        )
+        resource_change_data = change_entry.get("ResourceChange", change_entry.get("resource_change", {}))
         if not isinstance(resource_change_data, dict):
-            raise ValueError(
-                f"CloudFormation Changes[{index}].ResourceChange must be a JSON object"
-            )
-        action_str = change_entry.get(
-            "Action", resource_change_data.get("Action", "Modify")
-        )
+            raise ValueError(f"CloudFormation Changes[{index}].ResourceChange must be a JSON object")
+        action_str = change_entry.get("Action", resource_change_data.get("Action", "Modify"))
 
         action = CFN_ACTION_MAP.get(action_str, ChangeAction.UPDATE)
 
@@ -81,16 +75,12 @@ def parse_cloudformation_changeset(changeset_json: str | dict[str, Any]) -> Depl
         if CFN_REPLACEMENT_MAP.get(str(replacement), False):
             action = ChangeAction.REPLACE
 
-        resource_type = resource_change_data.get(
-            "Type", resource_change_data.get("ResourceType", "unknown")
-        )
+        resource_type = resource_change_data.get("Type", resource_change_data.get("ResourceType", "unknown"))
         resource_name = resource_change_data.get(
             "LogicalResourceId",
             resource_change_data.get("PhysicalResourceId", "unknown"),
         )
-        address = resource_change_data.get(
-            "LogicalResourceId", f"{resource_type}.{resource_name}"
-        )
+        address = resource_change_data.get("LogicalResourceId", f"{resource_type}.{resource_name}")
 
         # Scope details for update changes
         details = resource_change_data.get("Details", [])
