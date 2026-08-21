@@ -143,8 +143,9 @@ class TestRollbackEdgeCases:
         # all produce meaningful output.
         plan = DeployPlan(source=ChangeSource.TERRAFORM, changes=[])
         cmds = generate_rollback_commands(plan)
-        assert len(cmds) > 1
-        assert "Terraform" in cmds[0]
+        # Empty plans short-circuit: no header, no blanket destroy-everything
+        # suggestion for a plan with nothing to roll back.
+        assert cmds == ["# No changes to roll back"]
 
     def test_cloudformation_rollback_no_raw_data(self):
         """_cloudformation_rollback with no raw_data uses STACK_NAME."""
