@@ -7,6 +7,10 @@ from enum import Enum
 from typing import Any
 
 
+class PlanFormatError(ValueError):
+    """Raised when an input document does not match the expected plan format."""
+
+
 class ChangeAction(Enum):
     CREATE = "create"
     READ = "read"

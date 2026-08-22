@@ -8,7 +8,7 @@ from rich.console import Console
 from .cloudformation_parser import parse_cloudformation_changeset
 from .cost_estimator import estimate_costs
 from .diff_renderer import render_plan
-from .models import CostEstimate, DeployPlan
+from .models import CostEstimate, DeployPlan, PlanFormatError
 from .pulumi_parser import parse_pulumi_preview
 from .rollback import generate_rollback_commands
 from .terraform_parser import parse_terraform_plan
@@ -208,12 +208,16 @@ def _load_plan(
         )
         raise SystemExit(1)
 
-    if terraform_file:
-        return parse_terraform_plan(terraform_file)
-    elif cloudformation_file:
-        return parse_cloudformation_changeset(cloudformation_file)
-    elif pulumi_file:
-        return parse_pulumi_preview(pulumi_file)
+    try:
+        if terraform_file:
+            return parse_terraform_plan(terraform_file)
+        elif cloudformation_file:
+            return parse_cloudformation_changeset(cloudformation_file)
+        elif pulumi_file:
+            return parse_pulumi_preview(pulumi_file)
+    except PlanFormatError as exc:
+        console.print(f"[red]Error: {exc}[/red]")
+        raise SystemExit(1) from exc
 
     return None
 

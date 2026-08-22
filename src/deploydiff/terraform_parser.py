@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .models import ChangeAction, ChangeSource, DeployPlan, ResourceChange
+from .models import ChangeAction, ChangeSource, DeployPlan, PlanFormatError, ResourceChange
 
 # Terraform plan action mapping
 TF_ACTION_MAP: dict[str, ChangeAction] = {
@@ -43,8 +43,11 @@ def parse_terraform_plan(plan_json: str | dict[str, Any]) -> DeployPlan:
                 data = json.load(f)
     else:
         data = plan_json
+    if not isinstance(data, dict) or ("resource_changes" not in data and "format_version" not in data):
+        raise PlanFormatError("Input does not look like a Terraform plan JSON (expected 'resource_changes' or 'format_version' keys). Did you pass the right --tf file?")
 
     format_version = data.get("format_version", "")
+
     changes: list[ResourceChange] = []
 
     # Parse planned changes
