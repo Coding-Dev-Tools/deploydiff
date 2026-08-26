@@ -173,11 +173,18 @@ def estimate_costs(
         before_cost = _estimate_resource_cost(change, pricing, before=True)
         after_cost = _estimate_resource_cost(change, pricing, before=False)
 
+        # Flag resources with no pricing entry at all: they silently fall back
+        # to the generic default below, which can badly understate real cost.
+        unpriced = change.resource_type not in pricing
+
         estimate = CostEstimate(
             resource_address=change.address,
             monthly_cost_before=before_cost,
             monthly_cost_after=after_cost,
-            description=_build_cost_description(change, before_cost, after_cost),
+            description=_build_cost_description(
+                change, before_cost, after_cost, unpriced=unpriced
+            ),
+            used_default_pricing=unpriced,
         )
         estimates.append(estimate)
 
@@ -224,14 +231,28 @@ def _estimate_resource_cost(
     return type_pricing.get("default", 5.00)
 
 
-def _build_cost_description(change: ResourceChange, before: float, after: float) -> str:
-    """Build a human-readable cost description."""
+def _build_cost_description(
+    change: ResourceChange,
+    before: float,
+    after: float,
+    unpriced: bool = False,
+) -> str:
+    """Build a human-readable cost description.
+
+    When *unpriced* is True the resource type has no entry in the pricing
+    table, so both figures come from the generic default; say so explicitly
+    instead of presenting an invented number as if it were priced data.
+    """
     delta = after - before
     if delta > 0:
-        return f"+${delta:.2f}/mo"
+        desc = f"+${delta:.2f}/mo"
     elif delta < 0:
-        return f"-${abs(delta):.2f}/mo"
-    return "no change"
+        desc = f"-${abs(delta):.2f}/mo"
+    else:
+        desc = "no change"
+    if unpriced:
+        desc += f" [no pricing data for {change.resource_type}; generic default applied]"
+    return desc
 
 
 def _load_pricing(
@@ -239,11 +260,11 @@ def _load_pricing(
 ) -> dict[str, dict[str, float]]:
     """Load pricing data from a custom file, falling back to defaults."""
     if pricing_file is None:
-        return DEFAULT_PRICING.copy()
+        return copy.deepcopy(DEFAULT_PRICING)
 
     path = Path(pricing_file)
     if not path.exists():
-        return DEFAULT_PRICING.copy()
+        return copy.deepcopy(DEFAULT_PRICING)
 
     with path.open() as f:
         custom = json.load(f)

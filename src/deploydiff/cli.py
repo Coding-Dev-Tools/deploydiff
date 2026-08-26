@@ -244,14 +244,33 @@ def _render_costs(
         else:
             delta_str = "$0.00"
 
+        address_cell = est.resource_address
+        if est.used_default_pricing:
+            address_cell += " [yellow]⚠ generic est.[/yellow]"
         table.add_row(
-            est.resource_address,
+            address_cell,
             f"${est.monthly_cost_before:.2f}",
             f"${est.monthly_cost_after:.2f}",
             delta_str,
         )
 
     console.print(table)
+
+    # Surface unpriced resource types: their numbers are generic defaults,
+    # not real estimates. Never let a confident-looking total hide this.
+    unpriced_types = sorted(
+        {
+            change.resource_type
+            for change, est in zip(plan.changes, estimates, strict=False)
+            if est.used_default_pricing
+        }
+    )
+    if unpriced_types:
+        console.print(
+            f"\n[yellow]\u26a0 {len(unpriced_types)} resource type(s) have no "
+            f"pricing data ({', '.join(unpriced_types)}); their rows use a "
+            f"generic default estimate and totals may be inaccurate.[/yellow]"
+        )
 
     total = plan.total_monthly_delta
     if total > 0:
