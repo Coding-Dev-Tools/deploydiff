@@ -7,6 +7,10 @@ from enum import Enum
 from typing import Any
 
 
+class PlanFormatError(ValueError):
+    """Raised when an input document does not match the expected plan format."""
+
+
 class ChangeAction(Enum):
     CREATE = "create"
     READ = "read"
@@ -84,6 +88,9 @@ class CostEstimate:
     monthly_cost_after: float = 0.0
     currency: str = "USD"
     description: str = ""
+    # True when deploydiff had no pricing entry for this resource type and fell
+    # back to the generic default estimate. Surfaces silent under-estimation.
+    used_default_pricing: bool = False
 
     @property
     def monthly_delta(self) -> float:

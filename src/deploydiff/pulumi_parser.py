@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .models import ChangeAction, ChangeSource, DeployPlan, ResourceChange
+from .models import ChangeAction, ChangeSource, DeployPlan, PlanFormatError, ResourceChange
 
 # Pulumi step mapping
 PULUMI_STEP_MAP: dict[str, ChangeAction] = {
@@ -49,11 +49,18 @@ def parse_pulumi_preview(preview_json: str | dict[str, Any]) -> DeployPlan:
                 data = json.load(f)
     else:
         data = preview_json
+    if not isinstance(data, dict) or (
+        "steps" not in data
+        and "resourceChanges" not in data
+        and "resources" not in data
+    ):
+        raise PlanFormatError("Input does not look like a Pulumi preview JSON (expected 'steps', 'resourceChanges', or 'resources' keys). Did you pass the right --pulumi file?")
 
     changes: list[ResourceChange] = []
 
     # Pulumi preview JSON has a "steps" array
     steps = data.get("steps", [])
+
 
     # Also support the resource-oriented format
     resources = data.get("resourceChanges", data.get("resources", {}))

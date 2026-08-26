@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .models import ChangeAction, ChangeSource, DeployPlan, ResourceChange
+from .models import ChangeAction, ChangeSource, DeployPlan, PlanFormatError, ResourceChange
 
 # CloudFormation action mapping
 CFN_ACTION_MAP: dict[str, ChangeAction] = {
@@ -51,9 +51,12 @@ def parse_cloudformation_changeset(changeset_json: str | dict[str, Any]) -> Depl
                 data = json.load(f)
     else:
         data = changeset_json
+    if not isinstance(data, dict) or ("Changes" not in data and "changes" not in data):
+        raise PlanFormatError("Input does not look like a CloudFormation change set JSON (expected 'Changes' or 'changes' key). Did you pass the right --cfn file?")
 
     changes: list[ResourceChange] = []
     changes_list = data.get("Changes", data.get("changes", []))
+
 
     for change_entry in changes_list:
         resource_change_data = change_entry.get(
