@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from .models import ChangeSource, DeployPlan
+from .models import ChangeAction, ChangeSource, DeployPlan
 
 
 def generate_rollback_commands(plan: DeployPlan) -> list[str]:
@@ -14,6 +14,11 @@ def generate_rollback_commands(plan: DeployPlan) -> list[str]:
     Returns:
         List of rollback commands as strings.
     """
+    if all(
+        change.action in (ChangeAction.NO_OP, ChangeAction.READ)
+        for change in plan.changes
+    ):
+        return ["# No changes to roll back"]
     if plan.source == ChangeSource.TERRAFORM:
         return _terraform_rollback(plan)
     elif plan.source == ChangeSource.CLOUDFORMATION:
@@ -28,17 +33,47 @@ def _terraform_rollback(plan: DeployPlan) -> list[str]:
 
     Strategy: target the reverse of each destructive/create change.
     """
+    if not plan.changes:
+        return ["# No changes to roll back"]
+
     commands: list[str] = []
     commands.append("# Terraform Rollback Commands")
     commands.append("# Run these in reverse order to undo the deployment")
     commands.append("")
 
-    # For each create, we need to destroy it
-    for change in plan.creates:
+    # Replacements (create-before-delete / delete-before-create): revert by
+    # re-applying the PREVIOUS config. Do NOT also emit destroy + apply for
+    # these -- they used to appear in both the creates and destructive lists,
+    # producing contradictory commands for the same resource.
+    replacements = [
+        c
+        for c in plan.destructive_changes
+        if c.action
+        in (
+            ChangeAction.CREATE_BEFORE_DELETE,
+            ChangeAction.DELETE_BEFORE_CREATE,
+            ChangeAction.REPLACE,
+        )
+    ]
+
+    # For each pure create, we need to destroy it
+    pure_creates = [c for c in plan.creates if c.action == ChangeAction.CREATE]
+    for change in pure_creates:
         commands.append(f"terraform destroy -target={change.address} -auto-approve")
 
-    # For each destructive change (delete/replace), we need to re-apply it
-    for change in plan.destructive_changes:
+    # For each pure delete, we need to re-create it from the previous config
+    pure_deletes = [c for c in plan.destructive_changes if c.action == ChangeAction.DELETE]
+    for change in pure_deletes:
+        commands.append(
+            f"# To restore {change.address}, restore previous config and run:"
+        )
+        commands.append(f"terraform apply -target={change.address} -auto-approve")
+
+    # For each replacement, revert with the previous config
+    for change in replacements:
+        commands.append(
+            f"# To revert replaced {change.address}, restore previous config and run:"
+        )
         commands.append(f"terraform apply -target={change.address} -auto-approve")
 
     # For updates, we can try to revert with the previous state
@@ -47,16 +82,6 @@ def _terraform_rollback(plan: DeployPlan) -> list[str]:
             f"# To revert {change.address}, restore previous config and run:"
         )
         commands.append(f"terraform apply -target={change.address} -auto-approve")
-
-    if not plan.changes:
-        commands.append("# No changes to roll back")
-
-    # Add a full rollback option
-    commands.append("")
-    commands.append("# Or rollback the entire stack:")
-    commands.append("terraform apply -auto-approve  # with previous .tf files")
-    commands.append("# OR destroy everything and re-apply from a known good state:")
-    commands.append("terraform destroy -auto-approve && terraform apply -auto-approve")
 
     return commands
 

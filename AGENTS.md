@@ -5,9 +5,8 @@ Compare deployment configurations across environments. Detect drift between stag
 
 ## Build & Test Commands
 - Install (editable, from this repo): `pip install -e .`
-- Install (prebuilt wheel from the self-hosted index): `pip install --index-url https://coding-dev-tools.github.io/pypi-index/simple/ deploydiff`
 - Install (from source): `pip install git+https://github.com/Coding-Dev-Tools/deploydiff.git`
-- NOTE: `deploydiff` is NOT on public PyPI — use the self-hosted index or a `git+` URL above.
+- NOTE: `deploydiff` is NOT on public PyPI and the self-hosted pypi-index is unavailable (returns 404, verified dead 2026-08-21 Run 217). Use the `git+` form above — it is the only verified-working pip install.
 - Test: `pytest tests/` (or `python -m pytest tests/ -v --tb=short`)
 - Lint: `ruff check .`
 - Build: `pip install build twine && python -m build && twine check dist/*`
