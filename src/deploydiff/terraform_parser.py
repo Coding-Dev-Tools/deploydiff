@@ -44,15 +44,32 @@ def parse_terraform_plan(plan_json: str | dict[str, Any]) -> DeployPlan:
     else:
         data = plan_json
 
+    if not isinstance(data, dict):
+        raise ValueError("Plan input must be a JSON object")
+
     format_version = data.get("format_version", "")
     changes: list[ResourceChange] = []
 
     # Parse planned changes
     resource_changes = data.get("resource_changes", [])
+    if not isinstance(resource_changes, list):
+        raise ValueError("Terraform resource_changes must be a JSON array")
 
-    for rc in resource_changes:
+    for index, rc in enumerate(resource_changes):
+        if not isinstance(rc, dict):
+            raise ValueError(f"Terraform resource_changes[{index}] must be a JSON object")
         change = rc.get("change", {})
+        if not isinstance(change, dict):
+            raise ValueError(
+                f"Terraform resource_changes[{index}].change must be a JSON object"
+            )
         action_strs = change.get("actions", [])
+        if not isinstance(action_strs, list) or not all(
+            isinstance(action, str) for action in action_strs
+        ):
+            raise ValueError(
+                f"Terraform resource_changes[{index}].change.actions must be a JSON array of strings"
+            )
 
         # Use the primary action
         primary_action = _resolve_primary_action(action_strs)

@@ -50,16 +50,23 @@ def parse_pulumi_preview(preview_json: str | dict[str, Any]) -> DeployPlan:
     else:
         data = preview_json
 
+    if not isinstance(data, dict):
+        raise ValueError("Preview input must be a JSON object")
+
     changes: list[ResourceChange] = []
 
     # Pulumi preview JSON has a "steps" array
     steps = data.get("steps", [])
+    if not isinstance(steps, list):
+        raise ValueError("Pulumi steps must be a JSON array")
 
     # Also support the resource-oriented format
     resources = data.get("resourceChanges", data.get("resources", {}))
 
     # Process steps-based format
-    for step in steps:
+    for index, step in enumerate(steps):
+        if not isinstance(step, dict):
+            raise ValueError(f"Pulumi steps[{index}] must be a JSON object")
         urn = step.get("urn", step.get("old", {}).get("urn", "unknown"))
         step_type = step.get("step", step.get("op", "same"))
 
@@ -97,9 +104,19 @@ def parse_pulumi_preview(preview_json: str | dict[str, Any]) -> DeployPlan:
         changes.append(resource_change)
 
     # Process resource-changes-based format (count-based)
-    if not steps and isinstance(resources, dict):
+    if not steps:
+        if not isinstance(resources, dict):
+            raise ValueError("Pulumi resourceChanges must be a JSON object")
         for resource_type, counts in resources.items():
+            if not isinstance(counts, dict):
+                raise ValueError(
+                    f"Pulumi resourceChanges[{resource_type!r}] must be a JSON object"
+                )
             for action_str, count in counts.items():
+                if not isinstance(count, int) or isinstance(count, bool) or count < 0:
+                    raise ValueError(
+                        f"Pulumi resourceChanges[{resource_type!r}][{action_str!r}] must be a non-negative integer"
+                    )
                 action = PULUMI_STEP_MAP.get(action_str, ChangeAction.UPDATE)
                 for i in range(count):
                     resource_change = ResourceChange(
